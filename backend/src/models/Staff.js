@@ -16,7 +16,8 @@ const staffSchema = new mongoose.Schema({
       'Manager',
       'Accountant',
       'Volunteer Coordinator',
-      'Event Coordinator'
+      'Event Coordinator',
+      'Staff'
     ]
   },
   joiningDate: { type: Date, required: true },

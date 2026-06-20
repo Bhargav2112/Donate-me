@@ -38,9 +38,9 @@ const loginValidator = [
 ];
 
 const staffValidator = [
-  body('employeeId').trim().notEmpty().withMessage('Employee ID is required'),
+  body('employeeId').optional().trim(),
   body('fullName').trim().notEmpty().withMessage('Full Name is required'),
-  body('mobile').trim().notEmpty().withMessage('Mobile number is required'),
+  body('mobile').matches(/^\d{10}$/).withMessage('Mobile number must be exactly 10 digits'),
   body('email').trim().isEmail().withMessage('Enter a valid email address'),
   body('address').trim().notEmpty().withMessage('Address is required'),
   body('role')
@@ -50,27 +50,26 @@ const staffValidator = [
       'Manager',
       'Accountant',
       'Volunteer Coordinator',
-      'Event Coordinator'
+      'Event Coordinator',
+      'Staff'
     ])
     .withMessage('Invalid system role'),
   body('joiningDate').notEmpty().isISO8601().withMessage('Valid joining date is required'),
   body('status')
     .optional()
-    .isIn(['Active', 'Inactive', 'On Leave'])
+    .isIn(['Active', 'Inactive', 'On Leave', 'Suspended'])
     .withMessage('Invalid status'),
   validateResult
 ];
 
 const residentValidator = [
-  body('residentId').trim().notEmpty().withMessage('Resident ID is required'),
+  body('residentId').optional().trim(),
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('age').isInt({ min: 0 }).withMessage('Age must be a positive integer'),
   body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Gender must be Male, Female, or Other'),
-  body('medicalNotes').optional().trim(),
-  body('guardianDetails.name').trim().notEmpty().withMessage('Guardian Name is required'),
-  body('guardianDetails.mobile').trim().notEmpty().withMessage('Guardian Mobile is required'),
-  body('guardianDetails.relation').trim().notEmpty().withMessage('Guardian Relation is required'),
   body('admissionDate').notEmpty().isISO8601().withMessage('Valid admission date is required'),
+  body('informerMobile').optional({ checkFalsy: true }).matches(/^\d{10}$/).withMessage('Informer mobile must be exactly 10 digits'),
+  body('guardianMobile').optional({ checkFalsy: true }).matches(/^\d{10}$/).withMessage('Guardian mobile must be exactly 10 digits'),
   body('status')
     .optional()
     .isIn(['Active', 'Discharged', 'Deceased'])
@@ -79,33 +78,32 @@ const residentValidator = [
 ];
 
 const volunteerValidator = [
-  body('volunteerId').trim().notEmpty().withMessage('Volunteer ID is required'),
+  body('volunteerId').optional().trim(),
   body('fullName').trim().notEmpty().withMessage('Full name is required'),
-  body('mobile').trim().notEmpty().withMessage('Mobile number is required'),
+  body('mobile').matches(/^\d{10}$/).withMessage('Mobile number must be exactly 10 digits'),
   body('email').trim().isEmail().withMessage('Enter a valid email address'),
   body('address').optional().trim(),
-  body('skills').optional().isArray().withMessage('Skills must be an array of strings'),
-  body('interests').optional().isArray().withMessage('Interests must be an array of strings'),
-  body('totalHours').optional().isInt({ min: 0 }).withMessage('Total hours must be 0 or greater'),
+  body('skills').optional(),
+  body('interests').optional(),
+  body('totalHours').optional(),
   validateResult
 ];
 
 const donorValidator = [
   body('name').trim().notEmpty().withMessage('Donor name is required'),
-  body('mobile').trim().notEmpty().withMessage('Mobile number is required'),
+  body('mobile').matches(/^\d{10}$/).withMessage('Mobile number must be exactly 10 digits'),
   body('email').trim().isEmail().withMessage('Enter a valid email address'),
   body('address').optional().trim(),
   validateResult
 ];
 
 const donationValidator = [
-  // When recording a donation, we might send donor ID or donor details to register a new donor
   body('donorId').optional().isMongoId().withMessage('Invalid donor ID format'),
-  // Fallback donor details if registering donor inline
   body('donorDetails.name').optional().trim().notEmpty().withMessage('Donor name is required'),
-  body('donorDetails.mobile').optional().trim().notEmpty().withMessage('Donor mobile is required'),
-  body('donorDetails.email').optional().trim().isEmail().withMessage('Valid donor email is required'),
-  body('amount').isFloat({ min: 1 }).withMessage('Amount must be a positive number greater than 0'),
+  body('donorDetails.mobile').optional({ checkFalsy: true }).matches(/^\d{10}$/).withMessage('Donor mobile must be exactly 10 digits'),
+  body('donorDetails.email').optional({ checkFalsy: true }).isEmail().withMessage('Valid donor email is required'),
+  body('mobile').optional({ checkFalsy: true }).matches(/^\d{10}$/).withMessage('Mobile number must be exactly 10 digits'),
+  body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be a positive number'),
   body('transactionId').trim().notEmpty().withMessage('Transaction reference ID is required'),
   body('notes').optional().trim(),
   validateResult
@@ -114,7 +112,9 @@ const donationValidator = [
 const eventValidator = [
   body('title').trim().notEmpty().withMessage('Event title is required'),
   body('description').optional().trim(),
-  body('date').notEmpty().isISO8601().withMessage('Valid event date is required'),
+  body('date').optional().isISO8601().withMessage('Valid event date is required'),
+  body('startDate').optional().isISO8601().withMessage('Valid start date is required'),
+  body('endDate').optional().isISO8601().withMessage('Valid end date is required'),
   body('location').trim().notEmpty().withMessage('Event location is required'),
   validateResult
 ];

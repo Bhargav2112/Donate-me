@@ -9,12 +9,14 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const { volunteerValidator } = require('../validators/schemaValidators');
+const upload = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
 
 // Public endpoint for registration
 router.post(
   '/',
+  upload.single('photo'),
   volunteerValidator,
   createVolunteer
 );
@@ -29,6 +31,7 @@ router.get('/:id', getVolunteerById);
 router.put(
   '/:id',
   authorize('Super Admin', 'Admin', 'Manager', 'Volunteer Coordinator'),
+  upload.single('photo'),
   volunteerValidator,
   updateVolunteer
 );

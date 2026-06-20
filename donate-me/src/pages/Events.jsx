@@ -25,7 +25,13 @@ export default function Events() {
     return item[key] || item[`${field}_en`] || '';
   };
 
-  const filtered = events.filter(e => e.status === activeTab);
+  const filtered = events.filter(e => {
+    const status = (e.status || '').toLowerCase();
+    if (activeTab === 'upcoming') {
+      return status === 'upcoming' || status === 'ongoing';
+    }
+    return status === activeTab;
+  });
 
   return (
     <div>

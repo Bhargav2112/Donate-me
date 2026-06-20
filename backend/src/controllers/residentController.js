@@ -24,7 +24,42 @@ const getResidentById = async (req, res) => {
 
 const createResident = async (req, res) => {
   try {
-    const { residentId, name, age, gender, medicalNotes, guardianDetails, admissionDate, status } = req.body;
+    let {
+      residentId,
+      name,
+      age,
+      gender,
+      admissionDate,
+      admissionTime,
+      fatherHusbandName,
+      address,
+      identificationMark,
+      physicalCondition,
+      healthCondition,
+      broughtFrom,
+      institutionName,
+      informerName,
+      informerAddress,
+      informerMobile,
+      guardianName,
+      guardianAddress,
+      guardianMobile,
+      remarks,
+      status
+    } = req.body;
+
+    // Generate unique sequential Resident ID if not provided
+    if (!residentId || residentId.trim() === '') {
+      const lastResident = await Resident.findOne({}, {}, { sort: { residentId: -1 } });
+      let nextNum = 1;
+      if (lastResident && lastResident.residentId) {
+        const match = lastResident.residentId.match(/\d+/);
+        if (match) {
+          nextNum = parseInt(match[0], 10) + 1;
+        }
+      }
+      residentId = `RES-${String(nextNum).padStart(3, '0')}`;
+    }
 
     const existingResident = await Resident.findOne({ residentId });
     if (existingResident) {
@@ -34,30 +69,40 @@ const createResident = async (req, res) => {
       });
     }
 
-    let photoUrl = '';
+    let photoUrl = req.body.photo || req.body.photoUrl || '';
     if (req.file) {
       photoUrl = await uploadToCloudinary(req.file.path, 'residents');
     }
 
-    // Since express-validator check might parse guardianDetails as object or string if sent as multi-part form data
-    let parsedGuardianDetails = guardianDetails;
-    if (typeof guardianDetails === 'string') {
-      try {
-        parsedGuardianDetails = JSON.parse(guardianDetails);
-      } catch (e) {
-        return res.status(400).json({ success: false, message: 'Invalid guardianDetails JSON format' });
-      }
-    }
+    const parsedGuardianDetails = {
+      name: guardianName || 'None',
+      mobile: guardianMobile || '0000000000',
+      relation: 'Self'
+    };
 
     const newResident = await Resident.create({
       residentId,
       photo: photoUrl,
+      admissionDate,
+      admissionTime: admissionTime || '',
       name,
       age: Number(age),
+      fatherHusbandName: fatherHusbandName || '',
       gender,
-      medicalNotes: medicalNotes || '',
+      address: address || '',
+      identificationMark: identificationMark || '',
+      physicalCondition: physicalCondition || '',
+      healthCondition: healthCondition || '',
+      broughtFrom: broughtFrom || '',
+      institutionName: institutionName || '',
+      informerName: informerName || '',
+      informerAddress: informerAddress || '',
+      informerMobile: informerMobile || '',
       guardianDetails: parsedGuardianDetails,
-      admissionDate,
+      guardianName: guardianName || '',
+      guardianAddress: guardianAddress || '',
+      guardianMobile: guardianMobile || '',
+      remarks: remarks || '',
       status: status || 'Active'
     });
 
@@ -77,7 +122,29 @@ const updateResident = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resident not found' });
     }
 
-    const { residentId, name, age, gender, medicalNotes, guardianDetails, admissionDate, status } = req.body;
+    const {
+      residentId,
+      name,
+      age,
+      gender,
+      admissionDate,
+      admissionTime,
+      fatherHusbandName,
+      address,
+      identificationMark,
+      physicalCondition,
+      healthCondition,
+      broughtFrom,
+      institutionName,
+      informerName,
+      informerAddress,
+      informerMobile,
+      guardianName,
+      guardianAddress,
+      guardianMobile,
+      remarks,
+      status
+    } = req.body;
 
     if (residentId && residentId !== resident.residentId) {
       const duplicate = await Resident.findOne({ residentId });
@@ -89,31 +156,42 @@ const updateResident = async (req, res) => {
       }
     }
 
-    let photoUrl = resident.photo;
+    let photoUrl = req.body.photo || req.body.photoUrl || resident.photo;
     if (req.file) {
       photoUrl = await uploadToCloudinary(req.file.path, 'residents');
     }
 
-    let parsedGuardianDetails = guardianDetails;
-    if (typeof guardianDetails === 'string') {
-      try {
-        parsedGuardianDetails = JSON.parse(guardianDetails);
-      } catch (e) {
-        return res.status(400).json({ success: false, message: 'Invalid guardianDetails JSON format' });
-      }
-    }
+    const parsedGuardianDetails = {
+      name: guardianName || resident.guardianName || 'None',
+      mobile: guardianMobile || resident.guardianMobile || '0000000000',
+      relation: 'Self'
+    };
 
     const updatedResident = await Resident.findByIdAndUpdate(
       req.params.id,
       {
         residentId: residentId || resident.residentId,
         photo: photoUrl,
+        admissionDate: admissionDate || resident.admissionDate,
+        admissionTime: admissionTime !== undefined ? admissionTime : resident.admissionTime,
         name: name || resident.name,
         age: age ? Number(age) : resident.age,
+        fatherHusbandName: fatherHusbandName !== undefined ? fatherHusbandName : resident.fatherHusbandName,
         gender: gender || resident.gender,
-        medicalNotes: medicalNotes !== undefined ? medicalNotes : resident.medicalNotes,
-        guardianDetails: parsedGuardianDetails || resident.guardianDetails,
-        admissionDate: admissionDate || resident.admissionDate,
+        address: address !== undefined ? address : resident.address,
+        identificationMark: identificationMark !== undefined ? identificationMark : resident.identificationMark,
+        physicalCondition: physicalCondition !== undefined ? physicalCondition : resident.physicalCondition,
+        healthCondition: healthCondition !== undefined ? healthCondition : resident.healthCondition,
+        broughtFrom: broughtFrom !== undefined ? broughtFrom : resident.broughtFrom,
+        institutionName: institutionName !== undefined ? institutionName : resident.institutionName,
+        informerName: informerName !== undefined ? informerName : resident.informerName,
+        informerAddress: informerAddress !== undefined ? informerAddress : resident.informerAddress,
+        informerMobile: informerMobile !== undefined ? informerMobile : resident.informerMobile,
+        guardianDetails: parsedGuardianDetails,
+        guardianName: guardianName !== undefined ? guardianName : resident.guardianName,
+        guardianAddress: guardianAddress !== undefined ? guardianAddress : resident.guardianAddress,
+        guardianMobile: guardianMobile !== undefined ? guardianMobile : resident.guardianMobile,
+        remarks: remarks !== undefined ? remarks : resident.remarks,
         status: status || resident.status
       },
       { new: true, runValidators: true }

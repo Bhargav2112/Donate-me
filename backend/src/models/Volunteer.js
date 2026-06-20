@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const volunteerSchema = new mongoose.Schema({
   volunteerId: { type: String, required: true, unique: true, uppercase: true, trim: true },
+  photo: { type: String, default: '' },
   fullName: { type: String, required: true, trim: true },
   mobile: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },

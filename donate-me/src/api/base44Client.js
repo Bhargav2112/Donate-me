@@ -251,23 +251,56 @@ const volunteerSerializers = {
 const eventSerializers = {
   toBackend: (p) => ({
     title: p.title,
-    description: p.description || '',
     date: p.event_date || p.date || new Date().toISOString(),
     location: p.location || 'Ashram Area',
-    gallery: p.gallery_urls || (p.image_url ? [p.image_url] : [])
+    gallery: p.gallery_urls || p.gallery_images || (p.image_url ? [p.image_url] : []),
+    description: JSON.stringify({
+      description: p.description || '',
+      category: p.category || 'Other',
+      end_date: p.end_date || '',
+      coordinator: p.coordinator || '',
+      budget: Number(p.budget) || 0,
+      spent: Number(p.spent) || 0,
+      volunteers_assigned: Number(p.volunteers_assigned) || 0,
+      attendees: Number(p.attendees) || 0,
+      status: p.status || 'Upcoming'
+    })
   }),
-  toFrontend: (i) => ({
-    id: i._id,
-    title: i.title,
-    description: i.description,
-    event_date: i.date,
-    date: i.date,
-    location: i.location,
-    gallery_urls: i.gallery || [],
-    image_url: i.gallery && i.gallery.length > 0 ? i.gallery[0] : '',
-    status: new Date(i.date) >= new Date() ? 'upcoming' : 'completed',
-    created_date: i.createdAt
-  })
+  toFrontend: (i) => {
+    let extra = {};
+    try {
+      extra = JSON.parse(i.description);
+    } catch (e) {
+      extra = { description: i.description };
+    }
+    
+    // Status fallback based on date if not present
+    let status = extra.status || i.status;
+    if (!status) {
+      status = new Date(i.date) >= new Date() ? 'Upcoming' : 'Completed';
+    }
+
+    return {
+      id: i._id,
+      title: i.title,
+      description: extra.description || i.description || '',
+      event_date: i.date,
+      date: i.date,
+      end_date: extra.end_date || '',
+      location: i.location,
+      coordinator: extra.coordinator || '',
+      budget: extra.budget || 0,
+      spent: extra.spent || 0,
+      volunteers_assigned: extra.volunteers_assigned || 0,
+      attendees: extra.attendees || 0,
+      status: status,
+      category: extra.category || 'Other',
+      gallery_urls: i.gallery || [],
+      gallery_images: i.gallery || [],
+      image_url: i.gallery && i.gallery.length > 0 ? i.gallery[0] : '',
+      created_date: i.createdAt
+    };
+  }
 };
 
 const wishWallSerializers = {
@@ -275,7 +308,7 @@ const wishWallSerializers = {
     title: p.title || p.wish_item || 'Welfare Need',
     quantity: 1,
     priority: p.priority || 'Medium',
-    status: p.status || 'Pending',
+    status: p.status === 'Open' ? 'Pending' : (p.status === 'In Progress' ? 'Partially Fulfilled' : (p.status === 'Closed' ? 'Fulfilled' : (p.status || 'Pending'))),
     description: JSON.stringify({
       description: p.description || '',
       category: p.category || 'Other',
@@ -315,6 +348,76 @@ const auditLogSerializers = {
     created_date: i.timestamp
   })
 };
+
+const wishItemSerializers = {
+  toBackend: (p) => ({
+    title: p.title_en || p.title || 'Welfare Need',
+    quantity: p.quantity_needed || 1,
+    priority: p.priority === 'high' ? 'High' : (p.priority === 'low' ? 'Low' : 'Medium'),
+    status: p.quantity_fulfilled >= p.quantity_needed ? 'Fulfilled' : (p.quantity_fulfilled > 0 ? 'Partially Fulfilled' : 'Pending'),
+    description: JSON.stringify({
+      title_gu: p.title_gu || '',
+      title_en: p.title_en || '',
+      title_hi: p.title_hi || '',
+      description_gu: p.description_gu || '',
+      description_en: p.description_en || '',
+      description_hi: p.description_hi || '',
+      category: p.category || 'supplies',
+      quantity_needed: p.quantity_needed || 1,
+      quantity_fulfilled: p.quantity_fulfilled || 0,
+      icon: p.icon || ''
+    })
+  }),
+  toFrontend: (i) => {
+    let extra = {};
+    try {
+      extra = JSON.parse(i.description);
+    } catch (e) {
+      extra = { description: i.description };
+    }
+    
+    // Normalize category
+    let cat = (extra.category || 'supplies').toLowerCase();
+    if (cat === 'medical' || cat === 'health') cat = 'health';
+    else if (cat === 'education') cat = 'education';
+    else if (cat === 'food') cat = 'food';
+    else cat = 'supplies';
+
+    // Normalize priority
+    let prio = (i.priority || 'medium').toLowerCase();
+    if (prio === 'urgent' || prio === 'high') prio = 'high';
+    else if (prio === 'low') prio = 'low';
+    else prio = 'medium';
+
+    const quantity_needed = extra.quantity_needed || i.quantity || 1;
+    const quantity_fulfilled = i.status === 'Fulfilled' ? quantity_needed : (extra.quantity_fulfilled || 0);
+
+    return {
+      id: i._id,
+      title_en: extra.title_en || i.title || '',
+      title_gu: extra.title_gu || i.title || '',
+      title_hi: extra.title_hi || i.title || '',
+      description_en: extra.description_en || extra.description || i.description || '',
+      description_gu: extra.description_gu || '',
+      description_hi: extra.description_hi || '',
+      category: cat,
+      priority: prio,
+      quantity_needed,
+      quantity_fulfilled,
+      icon: extra.icon || '',
+      created_date: i.createdAt
+    };
+  }
+};
+
+const contactMessageEntity = {
+  create: async (payload) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('Contact Message received:', payload);
+    return { success: true, data: payload };
+  }
+};
+
 
 // ---------------------- DYNAMIC QR CONFIG LOGIC ----------------------
 const qrEntity = {
@@ -443,6 +546,8 @@ export const base44 = {
     Volunteer: new HttpEntity('/volunteers', 'Volunteer', volunteerSerializers),
     Event: new HttpEntity('/events', 'Event', eventSerializers),
     WishWall: new HttpEntity('/requirements', 'WishWall', wishWallSerializers),
+    WishItem: new HttpEntity('/requirements', 'WishItem', wishItemSerializers),
+    ContactMessage: contactMessageEntity,
     QRDonation: qrEntity,
     AuditLog: new HttpEntity('/dashboard', 'AuditLog', { toFrontend: auditLogSerializers.toFrontend })
   },

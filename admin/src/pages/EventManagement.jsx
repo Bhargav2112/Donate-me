@@ -49,6 +49,15 @@ export default function EventManagement() {
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (form.end_date && form.event_date && new Date(form.end_date) < new Date(form.event_date)) {
+      toast({
+        title: "Validation Error",
+        description: "End Date cannot be before Start Date",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSaving(true);
     if (editing) {
       await base44.entities.Event.update(editing.id, form);

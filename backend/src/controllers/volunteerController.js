@@ -1,4 +1,5 @@
 const Volunteer = require('../models/Volunteer');
+const { uploadToCloudinary } = require('../services/cloudinaryService');
 
 const getVolunteers = async (req, res) => {
   try {
@@ -23,7 +24,20 @@ const getVolunteerById = async (req, res) => {
 
 const createVolunteer = async (req, res) => {
   try {
-    const { volunteerId, fullName, mobile, email, address, skills, interests, totalHours } = req.body;
+    let { volunteerId, fullName, mobile, email, address, skills, interests, totalHours } = req.body;
+
+    // Generate unique sequential Volunteer ID if not provided
+    if (!volunteerId || volunteerId.trim() === '') {
+      const lastVolunteer = await Volunteer.findOne({}, {}, { sort: { volunteerId: -1 } });
+      let nextNum = 1;
+      if (lastVolunteer && lastVolunteer.volunteerId) {
+        const match = lastVolunteer.volunteerId.match(/\d+/);
+        if (match) {
+          nextNum = parseInt(match[0], 10) + 1;
+        }
+      }
+      volunteerId = `VOL-${String(nextNum).padStart(3, '0')}`;
+    }
 
     const existingVolunteer = await Volunteer.findOne({
       $or: [{ volunteerId }, { email }]
@@ -35,14 +49,24 @@ const createVolunteer = async (req, res) => {
       });
     }
 
+    let photoUrl = req.body.photo || req.body.photoUrl || '';
+    if (req.file) {
+      photoUrl = await uploadToCloudinary(req.file.path, 'volunteers');
+    }
+
+    // Support skills and interests as array or comma-separated string
+    const parsedSkills = Array.isArray(skills) ? skills : (skills ? skills.split(',').map(s => s.trim()) : []);
+    const parsedInterests = Array.isArray(interests) ? interests : (interests ? interests.split(',').map(i => i.trim()) : []);
+
     const newVolunteer = await Volunteer.create({
       volunteerId,
+      photo: photoUrl,
       fullName,
       mobile,
       email,
       address: address || '',
-      skills: skills || [],
-      interests: interests || [],
+      skills: parsedSkills,
+      interests: parsedInterests,
       totalHours: Number(totalHours) || 0
     });
 
@@ -80,16 +104,25 @@ const updateVolunteer = async (req, res) => {
       }
     }
 
+    let photoUrl = req.body.photo || req.body.photoUrl || volunteer.photo;
+    if (req.file) {
+      photoUrl = await uploadToCloudinary(req.file.path, 'volunteers');
+    }
+
+    const parsedSkills = skills ? (Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim())) : volunteer.skills;
+    const parsedInterests = interests ? (Array.isArray(interests) ? interests : interests.split(',').map(i => i.trim())) : volunteer.interests;
+
     const updatedVolunteer = await Volunteer.findByIdAndUpdate(
       req.params.id,
       {
         volunteerId: volunteerId || volunteer.volunteerId,
+        photo: photoUrl,
         fullName: fullName || volunteer.fullName,
         mobile: mobile || volunteer.mobile,
         email: email || volunteer.email,
         address: address !== undefined ? address : volunteer.address,
-        skills: skills || volunteer.skills,
-        interests: interests || volunteer.interests,
+        skills: parsedSkills,
+        interests: parsedInterests,
         totalHours: totalHours !== undefined ? Number(totalHours) : volunteer.totalHours
       },
       { new: true, runValidators: true }

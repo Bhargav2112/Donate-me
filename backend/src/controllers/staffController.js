@@ -24,7 +24,20 @@ const getStaffById = async (req, res) => {
 
 const createStaff = async (req, res) => {
   try {
-    const { employeeId, fullName, mobile, email, address, role, joiningDate, status } = req.body;
+    let { employeeId, fullName, mobile, email, address, role, joiningDate, status } = req.body;
+
+    // Generate unique sequential Employee ID if not provided
+    if (!employeeId || employeeId.trim() === '') {
+      const lastStaff = await Staff.findOne({}, {}, { sort: { employeeId: -1 } });
+      let nextNum = 1;
+      if (lastStaff && lastStaff.employeeId) {
+        const match = lastStaff.employeeId.match(/\d+/);
+        if (match) {
+          nextNum = parseInt(match[0], 10) + 1;
+        }
+      }
+      employeeId = `EMP-${String(nextNum).padStart(3, '0')}`;
+    }
 
     const existingStaff = await Staff.findOne({
       $or: [{ employeeId }, { email }]
@@ -36,7 +49,7 @@ const createStaff = async (req, res) => {
       });
     }
 
-    let photoUrl = '';
+    let photoUrl = req.body.photo || req.body.photoUrl || '';
     if (req.file) {
       photoUrl = await uploadToCloudinary(req.file.path, 'staff');
     }
@@ -88,7 +101,7 @@ const updateStaff = async (req, res) => {
       }
     }
 
-    let photoUrl = staff.photo;
+    let photoUrl = req.body.photo || req.body.photoUrl || staff.photo;
     if (req.file) {
       photoUrl = await uploadToCloudinary(req.file.path, 'staff');
     }
