@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Heart, UserCheck, Calendar, Users, Home, HandCoins, ArrowRight } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -183,7 +184,9 @@ export default function Dashboard() {
         <div className="bg-card rounded-xl border border-border p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold font-heading text-sm">Recent Donations</h3>
-            <ArrowRight className="w-4 h-4 text-muted-foreground" />
+            <Link to="/donations" className="p-1 rounded-md hover:bg-muted transition-colors" title="View all donations">
+              <ArrowRight className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+            </Link>
           </div>
           <div className="space-y-3">
             {recentDonations.length === 0 ? (
@@ -206,7 +209,9 @@ export default function Dashboard() {
         <div className="bg-card rounded-xl border border-border p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold font-heading text-sm">Upcoming Events</h3>
-            <ArrowRight className="w-4 h-4 text-muted-foreground" />
+            <Link to="/events" className="p-1 rounded-md hover:bg-muted transition-colors" title="View all events">
+              <ArrowRight className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+            </Link>
           </div>
           <div className="space-y-3">
             {recentEvents.length === 0 ? (
