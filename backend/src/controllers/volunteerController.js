@@ -155,10 +155,20 @@ const deleteVolunteer = async (req, res) => {
   }
 };
 
+const getPublicVolunteers = async (req, res) => {
+  try {
+    const volunteers = await Volunteer.find({}, 'fullName photo skills createdAt').sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: volunteers.length, data: volunteers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getVolunteers,
   getVolunteerById,
   createVolunteer,
   updateVolunteer,
-  deleteVolunteer
+  deleteVolunteer,
+  getPublicVolunteers
 };

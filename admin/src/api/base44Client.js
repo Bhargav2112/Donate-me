@@ -42,6 +42,19 @@ class HttpEntity {
     this.toFrontend = serializers.toFrontend || ((i) => i);
   }
 
+  async uploadFormFiles(payload) {
+    const resolvedPayload = { ...payload };
+    for (const key of Object.keys(resolvedPayload)) {
+      const val = resolvedPayload[key];
+      if (val instanceof File) {
+        // Upload the file first!
+        const uploadRes = await base44.integrations.Core.UploadFile({ file: val });
+        resolvedPayload[key] = uploadRes.file_url;
+      }
+    }
+    return resolvedPayload;
+  }
+
   async list(order = '', limit = 100) {
     const headers = getHeaders();
     let url = `${BASE_URL}${this.endpoint}`;
@@ -69,7 +82,8 @@ class HttpEntity {
 
   async create(payload) {
     const headers = getHeaders();
-    const backendPayload = this.toBackend(payload);
+    const resolvedPayload = await this.uploadFormFiles(payload);
+    const backendPayload = this.toBackend(resolvedPayload);
     
     const res = await fetch(`${BASE_URL}${this.endpoint}`, {
       method: 'POST',
@@ -82,7 +96,8 @@ class HttpEntity {
 
   async update(id, payload) {
     const headers = getHeaders();
-    const backendPayload = this.toBackend(payload);
+    const resolvedPayload = await this.uploadFormFiles(payload);
+    const backendPayload = this.toBackend(resolvedPayload);
     
     const res = await fetch(`${BASE_URL}${this.endpoint}/${id}`, {
       method: 'PUT',
@@ -135,33 +150,74 @@ const staffSerializers = {
 
 const residentSerializers = {
   toBackend: (p) => ({
-    residentId: p.resident_id,
-    name: p.name,
+    residentId: p.resident_id || p.residentId,
+    photo: p.photo || '',
+    name: p.name || p.full_name || '',
     age: Number(p.age),
     gender: p.gender || 'Male',
-    medicalNotes: p.medical_notes || '',
-    admissionDate: p.admission_date || new Date().toISOString(),
+    address: p.address || '',
+    admissionDate: p.admission_date || p.admissionDate || new Date().toISOString(),
+    admissionTime: p.admission_time || p.admissionTime || '',
+    fatherHusbandName: p.father_husband_name || p.fatherHusbandName || '',
+    identificationMark: p.identification_mark || p.identificationMark || '',
+    physicalCondition: p.physical_condition || p.physicalCondition || '',
+    healthCondition: p.health_condition || p.healthCondition || '',
+    broughtFrom: p.brought_from || p.broughtFrom || '',
+    institutionName: p.institution_name || p.institutionName || '',
+    informerName: p.informer_name || p.informerName || '',
+    informerAddress: p.informer_address || p.informerAddress || '',
+    informerMobile: p.informer_mobile || p.informerMobile || '',
+    guardianName: p.guardian_name || p.guardianName || '',
+    guardianAddress: p.guardian_address || p.guardianAddress || '',
+    guardianMobile: p.guardian_mobile || p.guardianMobile || '',
+    remarks: p.remarks || '',
     status: p.status || 'Active',
-    photo: p.photo || '',
     guardianDetails: {
       name: p.guardian_name || 'None',
-      mobile: p.guardian_phone || '0000000000',
-      relation: p.guardian_relation || 'Self'
+      mobile: p.guardian_mobile || '0000000000',
+      relation: 'Self'
     }
   }),
   toFrontend: (i) => ({
     id: i._id,
     resident_id: i.residentId,
+    residentId: i.residentId,
+    photo: i.photo,
     name: i.name,
+    full_name: i.name,
     age: i.age,
     gender: i.gender,
-    medical_notes: i.medicalNotes,
+    address: i.address || '',
     admission_date: i.admissionDate,
-    status: i.status,
-    photo: i.photo,
-    guardian_name: i.guardianDetails?.name,
-    guardian_phone: i.guardianDetails?.mobile,
-    guardian_relation: i.guardianDetails?.relation,
+    admissionDate: i.admissionDate,
+    admission_time: i.admissionTime || '',
+    admissionTime: i.admissionTime || '',
+    father_husband_name: i.fatherHusbandName || '',
+    fatherHusbandName: i.fatherHusbandName || '',
+    identification_mark: i.identificationMark || '',
+    identificationMark: i.identificationMark || '',
+    physical_condition: i.physicalCondition || '',
+    physicalCondition: i.physicalCondition || '',
+    health_condition: i.healthCondition || '',
+    healthCondition: i.healthCondition || '',
+    brought_from: i.broughtFrom || '',
+    broughtFrom: i.broughtFrom || '',
+    institution_name: i.institutionName || '',
+    institutionName: i.institutionName || '',
+    informer_name: i.informerName || '',
+    informerName: i.informerName || '',
+    informer_address: i.informerAddress || '',
+    informerAddress: i.informerAddress || '',
+    informer_mobile: i.informerMobile || '',
+    informerMobile: i.informerMobile || '',
+    guardian_name: i.guardianName || i.guardianDetails?.name || '',
+    guardianName: i.guardianName || i.guardianDetails?.name || '',
+    guardian_address: i.guardianAddress || '',
+    guardianAddress: i.guardianAddress || '',
+    guardian_mobile: i.guardianMobile || i.guardianDetails?.mobile || '',
+    guardianMobile: i.guardianMobile || i.guardianDetails?.mobile || '',
+    remarks: i.remarks || '',
+    status: i.status || 'Active',
     created_date: i.createdAt
   })
 };
@@ -191,7 +247,8 @@ const donationSerializers = {
       transactionId: p.transaction_id || p.transactionId,
       screenshot: p.screenshot_url || p.screenshot || '',
       verificationStatus: p.verification_status || p.verificationStatus || 'Pending',
-      notes: p.purpose || p.message || p.notes || ''
+      notes: p.purpose || p.message || p.notes || '',
+      mobile: p.mobile || ''
     };
     if (p.donor_id || p.donorId) {
       payload.donorId = p.donor_id || p.donorId;
@@ -214,8 +271,10 @@ const donationSerializers = {
     amount: i.amount,
     transaction_id: i.transactionId,
     screenshot_url: i.screenshot,
+    screenshot: i.screenshot,
     verification_status: i.verificationStatus,
     purpose: i.notes,
+    notes: i.notes,
     message: i.notes,
     donation_date: i.donationDate,
     created_date: i.createdAt
@@ -224,8 +283,9 @@ const donationSerializers = {
 
 const volunteerSerializers = {
   toBackend: (p) => ({
-    volunteerId: p.volunteer_id || Math.random().toString(36).substr(2, 9).toUpperCase(),
-    fullName: p.full_name,
+    volunteerId: p.volunteer_id || p.volunteerId || '',
+    photo: p.photo || '',
+    fullName: p.full_name || p.name || '',
     mobile: p.mobile,
     email: p.email,
     address: p.address || '',
@@ -236,6 +296,8 @@ const volunteerSerializers = {
   toFrontend: (i) => ({
     id: i._id,
     volunteer_id: i.volunteerId,
+    volunteerId: i.volunteerId,
+    photo: i.photo || '',
     full_name: i.fullName,
     name: i.fullName,
     mobile: i.mobile,
@@ -244,6 +306,7 @@ const volunteerSerializers = {
     skills: Array.isArray(i.skills) ? i.skills.join(', ') : i.skills,
     interests: Array.isArray(i.interests) ? i.interests.join(', ') : i.interests,
     total_hours: i.totalHours,
+    totalHours: i.totalHours,
     created_date: i.createdAt,
     join_date: i.createdAt
   })
@@ -251,57 +314,47 @@ const volunteerSerializers = {
 
 const eventSerializers = {
   toBackend: (p) => ({
-    title: p.title,
-    date: p.event_date || p.date || new Date().toISOString(),
-    location: p.location || 'Ashram Area',
-    gallery: p.gallery_urls || p.gallery_images || (p.image_url ? [p.image_url] : []),
-    description: JSON.stringify({
-      description: p.description || '',
-      category: p.category || 'Other',
-      end_date: p.end_date || '',
-      coordinator: p.coordinator || '',
-      budget: Number(p.budget) || 0,
-      spent: Number(p.spent) || 0,
-      volunteers_assigned: Number(p.volunteers_assigned) || 0,
-      attendees: Number(p.attendees) || 0,
-      status: p.status || 'Upcoming'
-    })
+    title: p.title || p.eventName,
+    description: p.description || '',
+    startDate: p.event_date || p.startDate || p.date || new Date().toISOString(),
+    endDate: p.end_date || p.endDate || '',
+    location: p.location || '',
+    volunteers: p.volunteers || [],
+    gallery: p.gallery_urls || p.gallery_images || (p.image_url ? [p.image_url] : (p.image ? [p.image] : [])),
+    image: p.image || p.image_url || '',
+    status: p.status || 'Upcoming',
+    category: p.category || 'Other',
+    coordinator: p.coordinator || '',
+    budget: Number(p.budget) || 0,
+    spent: Number(p.spent) || 0,
+    volunteers_assigned: Number(p.volunteers_assigned) || 0,
+    attendees: Number(p.attendees) || 0
   }),
-  toFrontend: (i) => {
-    let extra = {};
-    try {
-      extra = JSON.parse(i.description);
-    } catch (e) {
-      extra = { description: i.description };
-    }
-    
-    // Status fallback based on date if not present
-    let status = extra.status || i.status;
-    if (!status) {
-      status = new Date(i.date) >= new Date() ? 'Upcoming' : 'Completed';
-    }
-
-    return {
-      id: i._id,
-      title: i.title,
-      description: extra.description || i.description || '',
-      event_date: i.date,
-      date: i.date,
-      end_date: extra.end_date || '',
-      location: i.location,
-      coordinator: extra.coordinator || '',
-      budget: extra.budget || 0,
-      spent: extra.spent || 0,
-      volunteers_assigned: extra.volunteers_assigned || 0,
-      attendees: extra.attendees || 0,
-      status: status,
-      category: extra.category || 'Other',
-      gallery_urls: i.gallery || [],
-      gallery_images: i.gallery || [],
-      image_url: i.gallery && i.gallery.length > 0 ? i.gallery[0] : '',
-      created_date: i.createdAt
-    };
-  }
+  toFrontend: (i) => ({
+    id: i._id,
+    title: i.title,
+    eventName: i.title,
+    description: i.description || '',
+    event_date: i.startDate || i.date,
+    date: i.startDate || i.date,
+    startDate: i.startDate || i.date,
+    end_date: i.endDate || '',
+    endDate: i.endDate || '',
+    location: i.location || '',
+    volunteers: i.volunteers || [],
+    gallery_urls: i.gallery || [],
+    gallery_images: i.gallery || [],
+    image: i.image || (i.gallery && i.gallery.length > 0 ? i.gallery[0] : ''),
+    image_url: i.image || (i.gallery && i.gallery.length > 0 ? i.gallery[0] : ''),
+    status: i.status || 'Upcoming',
+    category: i.category || 'Other',
+    coordinator: i.coordinator || '',
+    budget: i.budget || 0,
+    spent: i.spent || 0,
+    volunteers_assigned: i.volunteers_assigned || 0,
+    attendees: i.attendees || 0,
+    created_date: i.createdAt
+  })
 };
 
 const wishWallSerializers = {
@@ -338,6 +391,39 @@ const wishWallSerializers = {
       created_date: i.createdAt
     };
   }
+};
+
+const dischargeSerializers = {
+  toBackend: (p) => ({
+    residentId: p.resident_id || p.residentId,
+    residentName: p.resident_name || p.residentName || '',
+    address: p.address || '',
+    village: p.village || '',
+    taluka: p.taluka || '',
+    mobile: p.mobile || '',
+    date: p.date || new Date().toISOString(),
+    takingResponsibilityPerson: p.taking_responsibility_person || p.takingResponsibilityPerson || '',
+    relationship: p.relationship || '',
+    responsibilityAddress: p.responsibility_address || p.responsibilityAddress || p.address || '',
+    signature: p.signature || ''
+  }),
+  toFrontend: (i) => ({
+    id: i._id,
+    resident_id: i.residentId?._id || i.residentId || '',
+    resident_name: i.residentName || i.residentId?.name || '',
+    address: i.address || '',
+    village: i.village || '',
+    taluka: i.taluka || '',
+    mobile: i.mobile || '',
+    date: i.date,
+    taking_responsibility_person: i.takingResponsibilityPerson || '',
+    takingResponsibilityPerson: i.takingResponsibilityPerson || '',
+    relationship: i.relationship || '',
+    responsibility_address: i.responsibilityAddress || '',
+    responsibilityAddress: i.responsibilityAddress || '',
+    signature: i.signature || '',
+    created_date: i.createdAt
+  })
 };
 
 const auditLogSerializers = {
@@ -480,6 +566,7 @@ export const base44 = {
     Volunteer: new HttpEntity('/volunteers', 'Volunteer', volunteerSerializers),
     Event: new HttpEntity('/events', 'Event', eventSerializers),
     WishWall: new HttpEntity('/requirements', 'WishWall', wishWallSerializers),
+    Discharge: new HttpEntity('/discharge', 'Discharge', dischargeSerializers),
     QRDonation: qrEntity,
     AuditLog: new HttpEntity('/dashboard', 'AuditLog', { toFrontend: auditLogSerializers.toFrontend }) // Reads from activity log populated inside dashboard metrics
   },

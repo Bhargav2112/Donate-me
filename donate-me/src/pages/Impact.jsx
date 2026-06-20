@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLang } from '@/lib/i18n.jsx';
 import ScrollReveal from '@/components/shared/ScrollReveal';
 import SectionHeader from '@/components/shared/SectionHeader';
@@ -10,6 +10,28 @@ const COLORS = ['#1A535C', '#4ECDC4', '#FF6B6B', '#FFE66D'];
 
 export default function Impact() {
   const { t } = useLang();
+  const [stats, setStats] = useState({
+    totalResidents: 0,
+    totalVolunteers: 0,
+    totalDonations: 0,
+    totalEvents: 0
+  });
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/dashboard/public-stats')
+      .then(res => res.json())
+      .then(resData => {
+        if (resData && resData.success && resData.data) {
+          setStats({
+            totalResidents: resData.data.totalResidents || 0,
+            totalVolunteers: resData.data.totalVolunteers || 0,
+            totalDonations: resData.data.totalDonations || 0,
+            totalEvents: resData.data.totalEvents || 0
+          });
+        }
+      })
+      .catch(err => console.error('Failed to load public stats:', err));
+  }, []);
 
   const pieData = [
     { name: t('cat_food'), value: 35 },
@@ -39,10 +61,10 @@ export default function Impact() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCounter value={520} label={t('impact_beneficiaries')} icon={Heart} />
-            <StatCounter value={150} label={t('impact_volunteers')} icon={Users} />
-            <StatCounter value={1850000} label={t('impact_donations')} icon={IndianRupee} suffix="" />
-            <StatCounter value={85} label={t('impact_events_conducted')} icon={Calendar} />
+            <StatCounter value={stats.totalResidents} label={t('impact_beneficiaries')} icon={Heart} />
+            <StatCounter value={stats.totalVolunteers} label={t('impact_volunteers')} icon={Users} />
+            <StatCounter value={stats.totalDonations} label={t('impact_donations')} icon={IndianRupee} suffix="" />
+            <StatCounter value={stats.totalEvents} label={t('impact_events_conducted')} icon={Calendar} />
           </div>
         </div>
       </section>

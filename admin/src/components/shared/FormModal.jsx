@@ -23,7 +23,11 @@ export default function FormModal({ open, onClose, title, fields, values, onChan
                 <Select value={values[f.key] || ''} onValueChange={v => handleChange(f.key, v)}>
                   <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={`Select ${f.label}`} /></SelectTrigger>
                   <SelectContent>
-                    {f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                    {f.options.map(o => {
+                      const val = typeof o === 'object' ? o.value : o;
+                      const label = typeof o === 'object' ? o.label : o;
+                      return <SelectItem key={val} value={val}>{label}</SelectItem>;
+                    })}
                   </SelectContent>
                 </Select>
               ) : f.type === 'textarea' ? (
@@ -35,12 +39,31 @@ export default function FormModal({ open, onClose, title, fields, values, onChan
                   rows={3}
                 />
               ) : f.type === 'file' ? (
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => handleChange(f.key, e.target.files[0])}
-                  className="text-sm h-9"
-                />
+                <div className="space-y-2">
+                  {values[f.key] ? (
+                    <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-border group bg-muted flex items-center justify-center">
+                      <img
+                        src={typeof values[f.key] === 'string' ? values[f.key] : URL.createObjectURL(values[f.key])}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleChange(f.key, '')}
+                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => handleChange(f.key, e.target.files[0])}
+                      className="text-sm h-9"
+                    />
+                  )}
+                </div>
               ) : (
                 <Input
                   type={f.type || 'text'}

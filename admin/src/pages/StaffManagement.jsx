@@ -12,16 +12,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import moment from 'moment';
 
 const staffFields = [
-  { key: 'employee_id', label: 'Employee ID', placeholder: 'EMP-001' },
+  { key: 'employee_id', label: 'Employee ID (Auto Generated if empty)', placeholder: 'e.g. EMP-001' },
+  { key: 'photo', label: 'Photo', type: 'file' },
   { key: 'full_name', label: 'Full Name', required: true },
-  { key: 'email', label: 'Email', type: 'email' },
-  { key: 'mobile', label: 'Mobile' },
-  { key: 'address', label: 'Address', type: 'textarea' },
+  { key: 'mobile', label: 'Mobile Number', required: true },
+  { key: 'address', label: 'Address', type: 'textarea', required: true },
+  { key: 'email', label: 'Email', type: 'email', required: true },
   { key: 'role', label: 'Role', type: 'select', options: ['Super Admin', 'Admin', 'Manager', 'Accountant', 'Volunteer Coordinator', 'Event Coordinator', 'Staff'], required: true },
-  { key: 'department', label: 'Department' },
-  { key: 'joining_date', label: 'Joining Date', type: 'date' },
-  { key: 'salary', label: 'Salary', type: 'number' },
-  { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Suspended', 'Inactive'], required: true },
+  { key: 'joining_date', label: 'Joining Date', type: 'date', required: true },
+  { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive', 'On Leave'], required: true },
 ];
 
 export default function StaffManagement() {
@@ -67,10 +66,10 @@ export default function StaffManagement() {
     load();
   };
 
-  const toggleSuspend = async (row) => {
-    const newStatus = row.status === 'Suspended' ? 'Active' : 'Suspended';
+  const toggleStatus = async (row) => {
+    const newStatus = row.status === 'Active' ? 'Inactive' : 'Active';
     await base44.entities.Staff.update(row.id, { status: newStatus });
-    toast({ title: `Staff ${newStatus === 'Suspended' ? 'suspended' : 'activated'}` });
+    toast({ title: `Staff status updated to ${newStatus}` });
     load();
   };
 
@@ -104,8 +103,8 @@ export default function StaffManagement() {
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
             <Edit className="w-3.5 h-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); toggleSuspend(row); }}>
-            {row.status === 'Suspended' ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> : <Ban className="w-3.5 h-3.5 text-amber-500" />}
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); toggleStatus(row); }}>
+            {row.status === 'Active' ? <Ban className="w-3.5 h-3.5 text-amber-500" /> : <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />}
           </Button>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
             <Trash2 className="w-3.5 h-3.5 text-destructive" />
@@ -130,7 +129,7 @@ export default function StaffManagement() {
         searchKey={['full_name', 'email', 'employee_id']}
         filters={[
           { key: 'role', label: 'Role', options: ['Super Admin', 'Admin', 'Manager', 'Accountant', 'Volunteer Coordinator', 'Event Coordinator', 'Staff'] },
-          { key: 'status', label: 'Status', options: ['Active', 'Suspended', 'Inactive'] },
+          { key: 'status', label: 'Status', options: ['Active', 'Inactive', 'On Leave'] },
         ]}
       />
       <FormModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Staff' : 'Add Staff'} fields={staffFields} values={form} onChange={setForm} onSubmit={handleSave} loading={saving} />

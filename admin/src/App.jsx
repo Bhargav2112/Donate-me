@@ -26,6 +26,7 @@ import Reports from '@/pages/Reports';
 import Certificates from '@/pages/Certificates';
 import QRDonations from '@/pages/QRDonations';
 import Analytics from '@/pages/Analytics';
+import DischargeManagement from '@/pages/DischargeManagement';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
           <Route path="/certificates" element={<Certificates />} />
           <Route path="/qr-donations" element={<QRDonations />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/discharge" element={<DischargeManagement />} />
         </Route>
       </Route>
 

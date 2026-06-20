@@ -12,12 +12,7 @@ export default function TopBar() {
 
   return (
     <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 shrink-0 sticky top-0 z-30">
-      <div className="flex items-center gap-3 flex-1 pl-12 lg:pl-0">
-        <div className="relative max-w-sm w-full hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search anything..." className="pl-9 bg-muted/50 border-0 h-9 text-sm" />
-        </div>
-      </div>
+      <div className="flex items-center gap-3 flex-1 pl-12 lg:pl-0" />
 
       <div className="flex items-center gap-2">
         <button

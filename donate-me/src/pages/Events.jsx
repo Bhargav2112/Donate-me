@@ -9,10 +9,10 @@ import moment from 'moment';
 const EVENTS_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/b74ba8ef1_generated_a2282d49.png';
 
 export default function Events() {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     base44.entities.Event.list('-date')
@@ -21,15 +21,15 @@ export default function Events() {
   }, []);
 
   const getField = (item, field) => {
-    const key = `${field}_${lang}`;
-    return item[key] || item[`${field}_en`] || '';
+    if (field === 'title') return item.title || item.eventName || '';
+    if (field === 'description') return item.description || '';
+    if (field === 'location') return item.location || '';
+    return item[field] || '';
   };
 
   const filtered = events.filter(e => {
     const status = (e.status || '').toLowerCase();
-    if (activeTab === 'upcoming') {
-      return status === 'upcoming' || status === 'ongoing';
-    }
+    if (activeTab === 'all') return true;
     return status === activeTab;
   });
 
@@ -53,18 +53,30 @@ export default function Events() {
       <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Tabs */}
-          <div className="flex gap-2 mb-10">
+          <div className="flex flex-wrap gap-2 mb-10">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setActiveTab('ongoing')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'ongoing' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+            >
+              Ongoing
+            </button>
             <button
               onClick={() => setActiveTab('upcoming')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'upcoming' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              {t('upcoming_events')}
+              {t('upcoming_events') || 'Upcoming'}
             </button>
             <button
               onClick={() => setActiveTab('completed')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'completed' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              {t('completed_events')}
+              {t('completed_events') || 'Completed'}
             </button>
           </div>
 
@@ -82,27 +94,34 @@ export default function Events() {
               {filtered.map((event, i) => (
                 <ScrollReveal key={event.id} delay={i * 0.05}>
                   <div className="bg-card rounded-2xl border border-border overflow-hidden hover:border-secondary/30 transition-colors h-full flex flex-col">
-                    {event.image_url ? (
-                      <img src={event.image_url} alt={getField(event, 'title')} className="w-full h-48 object-cover" />
-                    ) : (
-                      <div className="w-full h-48 bg-muted/50 flex items-center justify-center">
-                        <ImageIcon className="w-10 h-10 text-muted-foreground/30" />
-                      </div>
-                    )}
+                    <div className="relative">
+                      {event.image_url || event.image ? (
+                        <img src={event.image_url || event.image} alt={getField(event, 'title')} className="w-full h-48 object-cover" />
+                      ) : (
+                        <div className="w-full h-48 bg-muted/50 flex items-center justify-center">
+                          <ImageIcon className="w-10 h-10 text-muted-foreground/30" />
+                        </div>
+                      )}
+                      <span className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${
+                        event.status?.toLowerCase() === 'ongoing' ? 'bg-emerald-500 text-white' :
+                        event.status?.toLowerCase() === 'upcoming' ? 'bg-blue-500 text-white' :
+                        event.status?.toLowerCase() === 'completed' ? 'bg-zinc-500 text-white' :
+                        'bg-red-500 text-white'
+                      }`}>
+                        {event.status || 'Upcoming'}
+                      </span>
+                    </div>
                     <div className="p-6 flex flex-col flex-1">
                       <h3 className="font-heading font-semibold text-foreground text-lg mb-3">{getField(event, 'title')}</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">{getField(event, 'description')}</p>
                       <div className="space-y-2 mt-auto">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4 text-primary shrink-0" />
-                          <span>{event.date ? moment(event.date).format('DD MMM YYYY') : '—'}</span>
+                          <span>
+                            {event.startDate || event.date ? moment(event.startDate || event.date).format('DD MMM YYYY') : '—'}
+                            {event.endDate && event.endDate !== event.startDate && ` - ${moment(event.endDate).format('DD MMM YYYY')}`}
+                          </span>
                         </div>
-                        {event.time && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4 text-primary shrink-0" />
-                            <span>{event.time}</span>
-                          </div>
-                        )}
                         {getField(event, 'location') && (
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <MapPin className="w-4 h-4 text-primary shrink-0" />

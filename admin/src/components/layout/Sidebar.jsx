@@ -11,6 +11,7 @@ const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
   { label: 'Staff', icon: Users, path: '/staff' },
   { label: 'Residents', icon: Home, path: '/residents' },
+  { label: 'Discharge Management', icon: LogOut, path: '/discharge' },
   { label: 'Donations', icon: Heart, path: '/donations' },
   { label: 'Donors', icon: UserPlus, path: '/donors' },
   { label: 'Volunteers', icon: UserCheck, path: '/volunteers' },

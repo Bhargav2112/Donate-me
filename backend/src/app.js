@@ -27,6 +27,7 @@ const requirementRoutes = require('./routes/requirementRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const qrRoutes = require('./routes/qrRoutes');
+const dischargeRoutes = require('./routes/dischargeRoutes');
 
 // Connect to Database
 connectDB();
@@ -86,6 +87,7 @@ app.use('/api/requirements', requirementRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/qr', qrRoutes);
+app.use('/api/discharge', dischargeRoutes);
 
 // File upload endpoint (general purpose)
 app.post('/api/upload', require('./middleware/uploadMiddleware').single('file'), async (req, res, next) => {

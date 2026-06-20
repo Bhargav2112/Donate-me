@@ -31,7 +31,12 @@ const createDonation = async (req, res) => {
   try {
     const { donorId, donorDetails, amount, transactionId, notes } = req.body;
 
-    if (!req.file) {
+    let screenshotUrl = req.body.screenshot || req.body.screenshot_url || '';
+    if (req.file) {
+      screenshotUrl = await uploadToCloudinary(req.file.path, 'donations');
+    }
+
+    if (!screenshotUrl) {
       return res.status(400).json({
         success: false,
         message: 'Transaction receipt screenshot is required'
@@ -85,8 +90,6 @@ const createDonation = async (req, res) => {
       });
     }
 
-    const screenshotUrl = await uploadToCloudinary(req.file.path, 'donations');
-
     const newDonation = await Donation.create({
       donorId: targetDonorId,
       amount: Number(amount),
@@ -127,7 +130,7 @@ const updateDonation = async (req, res) => {
       }
     }
 
-    let screenshotUrl = donation.screenshot;
+    let screenshotUrl = req.body.screenshot || req.body.screenshot_url || donation.screenshot;
     if (req.file) {
       screenshotUrl = await uploadToCloudinary(req.file.path, 'donations');
     }

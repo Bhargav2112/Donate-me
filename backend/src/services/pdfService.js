@@ -272,8 +272,117 @@ const generateMonthlyReportBuffer = (data) => {
   });
 };
 
+const generateDischargeFormBuffer = (discharge, resident) => {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const chunks = [];
+
+    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', err => reject(err));
+
+    // Outer border
+    doc.rect(30, 30, doc.page.width - 60, doc.page.height - 60).lineWidth(1.5).stroke('#1a365d');
+    doc.rect(35, 35, doc.page.width - 70, doc.page.height - 70).lineWidth(0.5).stroke('#d69e2e');
+
+    // Header Area
+    doc.fillColor('#1a365d').fontSize(22).font('Helvetica-Bold').text('JIVANJYOT MANAV MANDIR ASHRAM', 50, 60, { align: 'center' });
+    doc.fontSize(10).font('Helvetica').fillColor('#718096').text(
+      'Managed by Manav Seva Samaj Trust, Surat (Reg. No. E/7349/Surat)\n' +
+      'Phone: +91 99246 16768, +91 99254 23508 | Email: manavsevasamaj.surat@gmail.com',
+      50, 88, { align: 'center' }
+    );
+
+    // Decorative separator
+    doc.moveTo(50, 120).lineTo(doc.page.width - 50, 120).lineWidth(1.5).stroke('#d69e2e');
+
+    // Title
+    doc.fillColor('#2d3748').fontSize(16).font('Helvetica-Bold').text('RESIDENT DISCHARGE FORM (FORM NO. 2)', 50, 140, { align: 'center' });
+
+    // Date
+    const dischargeDateStr = new Date(discharge.date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#4a5568').text(`Discharge Date: ${dischargeDateStr}`, doc.page.width - 220, 170, { align: 'right' });
+
+    // Resident Details Section
+    doc.fillColor('#1a365d').fontSize(12).font('Helvetica-Bold').text('1. RESIDENT DETAILS', 50, 190);
+    doc.moveTo(50, 205).lineTo(doc.page.width - 50, 205).lineWidth(0.5).stroke('#cbd5e0');
+
+    doc.fontSize(10).font('Helvetica').fillColor('#2d3748');
+    const labelX = 60;
+    const valueX = 180;
+    
+    doc.font('Helvetica-Bold').text('Resident Name:', labelX, 220);
+    doc.font('Helvetica').text(discharge.residentName || resident.name, valueX, 220);
+
+    doc.font('Helvetica-Bold').text('Resident ID:', labelX, 235);
+    doc.font('Helvetica').text(resident.residentId || '—', valueX, 235);
+
+    doc.font('Helvetica-Bold').text('Primary Address:', labelX, 250);
+    doc.font('Helvetica').text(discharge.address || resident.address || '—', valueX, 250);
+
+    doc.font('Helvetica-Bold').text('Village / Taluka:', labelX, 265);
+    doc.font('Helvetica').text(`${discharge.village} / ${discharge.taluka}`, valueX, 265);
+
+    doc.font('Helvetica-Bold').text('Mobile Number:', labelX, 280);
+    doc.font('Helvetica').text(discharge.mobile || '—', valueX, 280);
+
+    // Discharge Declaration Text (as in Form 2 Gujarati, translated)
+    doc.fillColor('#1a365d').fontSize(12).font('Helvetica-Bold').text('2. DISCHARGE DECLARATION & RELEASE', 50, 315);
+    doc.moveTo(50, 330).lineTo(doc.page.width - 50, 330).lineWidth(0.5).stroke('#cbd5e0');
+
+    doc.fontSize(10).font('Helvetica-Oblique').fillColor('#4a5568');
+    doc.text(
+      'To the Management of Manav Seva Samaj Trust, Aashram Surat:\n\n' +
+      'We hereby state that our resident relative was admitted in the Ashram in a poor state of health and mind. ' +
+      'Today, through the treatment, boarding, and care provided completely free of charge by your institution, ' +
+      'they are being handed back over to our home in a safe, healthy, and restored condition.\n\n' +
+      'We express our deep gratitude to the organization. Henceforth, all custody, well-being, and legal ' +
+      'responsibilities of the discharged individual rest solely with us. The Aashram trust and its management ' +
+      'will hold zero responsibility or liability from this day forward.',
+      60, 345, { width: doc.page.width - 120, lineGap: 4 }
+    );
+
+    // Responsibility Person Details
+    doc.fillColor('#1a365d').fontSize(12).font('Helvetica-Bold').text('3. GUARDIAN / RESPONSIBILITY TAKER DETAILS', 50, 480);
+    doc.moveTo(50, 495).lineTo(doc.page.width - 50, 495).lineWidth(0.5).stroke('#cbd5e0');
+
+    doc.fontSize(10).font('Helvetica').fillColor('#2d3748');
+    doc.font('Helvetica-Bold').text('Responsible Person:', labelX, 510);
+    doc.font('Helvetica').text(discharge.takingResponsibilityPerson, valueX, 510);
+
+    doc.font('Helvetica-Bold').text('Relationship:', labelX, 525);
+    doc.font('Helvetica').text(discharge.relationship, valueX, 525);
+
+    doc.font('Helvetica-Bold').text('Contact Address:', labelX, 540);
+    doc.font('Helvetica').text(discharge.responsibilityAddress, valueX, 540, { width: doc.page.width - valueX - 60 });
+
+    // Signatures block
+    const sigY = 640;
+    
+    // Left side: Taker signature
+    doc.moveTo(60, sigY).lineTo(230, sigY).lineWidth(0.75).stroke('#718096');
+    doc.fillColor('#2d3748').font('Helvetica-Bold').fontSize(9).text('Signature of Responsibility Taker', 60, sigY + 6);
+    doc.font('Helvetica').fillColor('#718096').text(discharge.takingResponsibilityPerson, 60, sigY + 18);
+    if (discharge.signature) {
+      doc.font('Helvetica-Oblique').fillColor('#1a365d').text(`Signed: ${discharge.signature}`, 60, sigY - 14);
+    }
+
+    // Right side: Ashram representative
+    doc.moveTo(doc.page.width - 230, sigY).lineTo(doc.page.width - 60, sigY).lineWidth(0.75).stroke('#718096');
+    doc.fillColor('#2d3748').font('Helvetica-Bold').fontSize(9).text('Authorized Representative / Seal', doc.page.width - 230, sigY + 6, { align: 'center', width: 170 });
+    doc.font('Helvetica').fillColor('#718096').text('AASHRAM SURAT TRUSTEE', doc.page.width - 230, sigY + 18, { align: 'center', width: 170 });
+
+    doc.end();
+  });
+};
+
 module.exports = {
   generateCertificateBuffer,
   generateDonationReceiptBuffer,
-  generateMonthlyReportBuffer
+  generateMonthlyReportBuffer,
+  generateDischargeFormBuffer
 };

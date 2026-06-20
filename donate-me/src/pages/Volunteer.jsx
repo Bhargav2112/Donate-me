@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLang } from '@/lib/i18n.jsx';
 import { base44 } from '@/api/base44Client';
 import ScrollReveal from '@/components/shared/ScrollReveal';
@@ -13,10 +13,40 @@ export default function Volunteer() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [volunteers, setVolunteers] = useState([]);
+  const [loadingVolunteers, setLoadingVolunteers] = useState(true);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
   const [form, setForm] = useState({
     full_name: '', mobile: '', email: '', address: '',
     skills: [], interests: '', availability: 'weekdays',
   });
+
+  const fetchVolunteers = () => {
+    fetch('http://localhost:5000/api/volunteers/public')
+      .then(res => res.json())
+      .then(resData => {
+        if (resData && resData.success && resData.data) {
+          const mapped = resData.data.map(i => ({
+            id: i._id,
+            full_name: i.fullName,
+            photo: i.photo || '',
+            skills: i.skills || [],
+            created_date: i.createdAt
+          }));
+          setVolunteers(mapped);
+        }
+        setLoadingVolunteers(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch volunteers:', err);
+        setLoadingVolunteers(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchVolunteers();
+  }, []);
 
   const skillOptions = [
     { key: 'skill_teaching', value: 'teaching' },
@@ -42,14 +72,55 @@ export default function Volunteer() {
     }));
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.full_name.trim() || !form.mobile.trim()) return;
+    if (!form.full_name.trim()) {
+      toast({ description: "Please enter your name.", variant: "destructive" });
+      return;
+    }
+    const mobileRegex = /^\d{10}$/;
+    if (!mobileRegex.test(form.mobile.trim())) {
+      toast({ description: "Mobile number must be exactly 10 digits.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
-    await base44.entities.Volunteer.create(form);
-    setSubmitting(false);
-    setSubmitted(true);
-    toast({ description: t('success_msg') });
+    try {
+      let photo_url = '';
+      if (photoFile) {
+        const uploaded = await base44.integrations.Core.UploadFile({ file: photoFile });
+        photo_url = uploaded.file_url;
+      }
+      await base44.entities.Volunteer.create({
+        ...form,
+        photo: photo_url
+      });
+      setSubmitting(false);
+      setSubmitted(true);
+      toast({ description: t('success_msg') });
+      
+      // Refresh local list
+      fetchVolunteers();
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: error.message || "Failed to register. Please try again.",
+        variant: "destructive"
+      });
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -164,6 +235,42 @@ export default function Volunteer() {
                     ))}
                   </div>
                 </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">Profile Photo</label>
+                  <div className="flex items-center gap-4">
+                    {photoPreview ? (
+                      <div className="w-16 h-16 rounded-xl overflow-hidden border border-border bg-muted flex-shrink-0 relative group">
+                        <img src={photoPreview} alt="Profile Preview" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl border border-dashed border-border bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground text-xs">
+                        No Photo
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                      id="volunteer-photo"
+                    />
+                    <label
+                      htmlFor="volunteer-photo"
+                      className="px-4 py-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-sm font-medium cursor-pointer transition-colors"
+                    >
+                      Upload Photo
+                    </label>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={submitting}
@@ -174,6 +281,50 @@ export default function Volunteer() {
               </form>
             </ScrollReveal>
           </div>
+
+          {/* Dynamic Volunteer Gallery */}
+          <ScrollReveal>
+            <div className="mt-20 border-t border-border pt-16">
+              <div className="text-center mb-12">
+                <h3 className="font-heading font-bold text-3xl text-foreground mb-3">Our Dedicated Volunteers</h3>
+                <p className="text-muted-foreground text-sm max-w-md mx-auto">Meet the passionate individuals who dedicate their time and talent to support the smart care community.</p>
+              </div>
+              {loadingVolunteers ? (
+                <div className="text-center text-sm text-muted-foreground py-8">Loading volunteer gallery...</div>
+              ) : volunteers.length === 0 ? (
+                <div className="text-center text-sm text-muted-foreground py-8">No registered volunteers yet. Be the first to join!</div>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                  {volunteers.map(vol => (
+                    <div key={vol.id} className="flex gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/20 hover:shadow-sm transition-all">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                        {vol.photo ? (
+                          <img src={vol.photo} alt={vol.full_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xl">
+                            {vol.full_name?.charAt(0).toUpperCase() || 'V'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <h4 className="font-heading font-semibold text-foreground text-base truncate mb-0.5">{vol.full_name}</h4>
+                        <p className="text-xs text-muted-foreground mb-2">Joined: {new Date(vol.created_date || vol.join_date).toLocaleDateString()}</p>
+                        {vol.skills ? (
+                          <div className="flex flex-wrap gap-1">
+                            {(Array.isArray(vol.skills) ? vol.skills : String(vol.skills).split(',')).map((s, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-md bg-secondary/10 text-secondary text-[10px] font-semibold uppercase tracking-wider">
+                                {String(s).trim()}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLang } from '@/lib/i18n.jsx';
 import { base44 } from '@/api/base44Client';
 import ScrollReveal from '@/components/shared/ScrollReveal';
@@ -22,9 +22,20 @@ export default function Donate() {
   const [submitting, setSubmitting] = useState(false);
   const [fileName, setFileName] = useState('');
   const [fileObj, setFileObj] = useState(null);
+  const [qrConfig, setQrConfig] = useState(null);
   const [form, setForm] = useState({
     donor_name: '', mobile: '', amount: '', transaction_id: '', message: '',
   });
+
+  useEffect(() => {
+    base44.entities.QRDonation.list()
+      .then(res => {
+        if (res && res.length > 0) {
+          setQrConfig(res[0]);
+        }
+      })
+      .catch(err => console.error('Failed to load QR Config:', err));
+  }, []);
 
   const copyToClipboard = (text, key) => {
     navigator.clipboard.writeText(text);
@@ -51,21 +62,57 @@ export default function Donate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.donor_name.trim() || !form.mobile.trim() || !form.amount || !form.transaction_id.trim()) return;
-    setSubmitting(true);
-    let screenshot_url = '';
-    if (fileObj) {
-      const uploaded = await base44.integrations.Core.UploadFile({ file: fileObj });
-      screenshot_url = uploaded.file_url;
+    
+    if (!form.donor_name.trim()) {
+      toast({ description: "Please enter donor name.", variant: "destructive" });
+      return;
     }
-    await base44.entities.DonationSubmission.create({
-      ...form,
-      amount: parseFloat(form.amount),
-      screenshot_url,
-    });
-    setSubmitting(false);
-    setSubmitted(true);
-    toast({ description: t('success_msg') });
+
+    const mobileRegex = /^\d{10}$/;
+    if (!mobileRegex.test(form.mobile.trim())) {
+      toast({ description: "Mobile number must be exactly 10 digits.", variant: "destructive" });
+      return;
+    }
+
+    const amt = parseFloat(form.amount);
+    if (isNaN(amt) || amt <= 0) {
+      toast({ description: "Donation amount must be greater than zero.", variant: "destructive" });
+      return;
+    }
+
+    if (!form.transaction_id.trim()) {
+      toast({ description: "Please enter the Transaction reference ID.", variant: "destructive" });
+      return;
+    }
+
+    if (!fileObj) {
+      toast({ description: "Please upload transaction receipt screenshot.", variant: "destructive" });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      let screenshot_url = '';
+      if (fileObj) {
+        const uploaded = await base44.integrations.Core.UploadFile({ file: fileObj });
+        screenshot_url = uploaded.file_url;
+      }
+      await base44.entities.DonationSubmission.create({
+        ...form,
+        amount: amt,
+        screenshot_url,
+      });
+      setSubmitted(true);
+      toast({ description: t('success_msg') });
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: error.message || "Failed to submit donation. Please check your inputs.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const bankRows = [
@@ -128,9 +175,17 @@ export default function Donate() {
                 </div>
                 <div className="mt-6 p-4 rounded-xl bg-secondary/5 border border-secondary/10 text-center">
                   <p className="text-xs text-muted-foreground mb-2">{t('qr_code')}</p>
-                  <div className="w-32 h-32 bg-muted rounded-xl mx-auto flex items-center justify-center">
-                    <span className="text-xs text-muted-foreground">QR Code</span>
-                  </div>
+                  {qrConfig ? (
+                    <div className="space-y-2">
+                      <img src={qrConfig.qr_image || qrConfig.qr_code_url} alt="UPI QR Code" className="w-36 h-36 mx-auto rounded-xl border border-border bg-white p-1" />
+                      <div className="text-xs font-semibold text-foreground">{qrConfig.title}</div>
+                      <div className="text-[10px] text-muted-foreground font-mono">{qrConfig.purpose}</div>
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 bg-muted rounded-xl mx-auto flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground">QR Code</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </ScrollReveal>

@@ -12,18 +12,28 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import moment from 'moment';
 
 const residentFields = [
-  { key: 'resident_id', label: 'Resident ID', placeholder: 'RES-001' },
-  { key: 'name', label: 'Name', required: true },
+  { key: 'resident_id', label: 'Resident ID (Auto Generated if empty)', placeholder: 'e.g. RES-001' },
+  { key: 'photo', label: 'Resident Photo', type: 'file' },
+  { key: 'admission_date', label: 'Admission Date', type: 'date', required: true },
+  { key: 'admission_time', label: 'Admission Time', placeholder: 'e.g. 10:30 AM' },
+  { key: 'name', label: 'Full Name', required: true },
   { key: 'age', label: 'Age', type: 'number', required: true },
+  { key: 'father_husband_name', label: 'Father / Husband Name' },
   { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female', 'Other'], required: true },
-  { key: 'blood_group', label: 'Blood Group' },
-  { key: 'medical_notes', label: 'Medical Notes', type: 'textarea' },
+  { key: 'address', label: 'Address', type: 'textarea' },
+  { key: 'identification_mark', label: 'Identification Mark' },
+  { key: 'physical_condition', label: 'Physical Condition', type: 'textarea', placeholder: 'e.g. Weak, Mentally Challenged' },
+  { key: 'health_condition', label: 'Health Condition', type: 'textarea' },
+  { key: 'brought_from', label: 'Brought From (Location)' },
+  { key: 'institution_name', label: 'Institution Name' },
+  { key: 'informer_name', label: 'Informer Name' },
+  { key: 'informer_address', label: 'Informer Address' },
+  { key: 'informer_mobile', label: 'Informer Mobile' },
   { key: 'guardian_name', label: 'Guardian Name' },
-  { key: 'guardian_phone', label: 'Guardian Phone' },
-  { key: 'guardian_relation', label: 'Guardian Relation' },
-  { key: 'emergency_contact', label: 'Emergency Contact' },
-  { key: 'admission_date', label: 'Admission Date', type: 'date' },
-  { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Discharged', 'Transferred'], required: true },
+  { key: 'guardian_address', label: 'Guardian Address' },
+  { key: 'guardian_mobile', label: 'Guardian Mobile' },
+  { key: 'remarks', label: 'Additional Remarks / Admission Notes', type: 'textarea' },
+  { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Discharged', 'Deceased'], required: true },
 ];
 
 export default function ResidentManagement() {
@@ -121,7 +131,7 @@ export default function ResidentManagement() {
         searchKey={['name', 'resident_id']}
         filters={[
           { key: 'gender', label: 'Gender', options: ['Male', 'Female', 'Other'] },
-          { key: 'status', label: 'Status', options: ['Active', 'Discharged', 'Transferred'] },
+          { key: 'status', label: 'Status', options: ['Active', 'Discharged', 'Deceased'] },
         ]}
       />
       <FormModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Resident' : 'Add Resident'} fields={residentFields} values={form} onChange={setForm} onSubmit={handleSave} loading={saving} />

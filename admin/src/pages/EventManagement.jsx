@@ -12,17 +12,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import moment from 'moment';
 
 const eventFields = [
-  { key: 'title', label: 'Title', required: true },
-  { key: 'description', label: 'Description', type: 'textarea' },
-  { key: 'category', label: 'Category', type: 'select', options: ['Health Camp', 'Education', 'Cultural', 'Sports', 'Fundraising', 'Community', 'Other'] },
+  { key: 'title', label: 'Event Name', required: true },
+  { key: 'description', label: 'Event Description', type: 'textarea' },
+  { key: 'image', label: 'Event Image', type: 'file' },
   { key: 'event_date', label: 'Start Date', type: 'date', required: true },
-  { key: 'end_date', label: 'End Date', type: 'date' },
-  { key: 'location', label: 'Location' },
-  { key: 'coordinator', label: 'Coordinator' },
-  { key: 'budget', label: 'Budget (₹)', type: 'number' },
-  { key: 'volunteers_assigned', label: 'Volunteers Assigned', type: 'number' },
-  { key: 'attendees', label: 'Expected Attendees', type: 'number' },
-  { key: 'status', label: 'Status', type: 'select', options: ['Upcoming', 'Ongoing', 'Completed', 'Cancelled'], required: true },
+  { key: 'end_date', label: 'End Date', type: 'date', required: true },
+  { key: 'location', label: 'Location', required: true },
+  { key: 'volunteers_assigned', label: 'Volunteers Count', type: 'number' },
 ];
 
 export default function EventManagement() {
@@ -122,8 +118,7 @@ export default function EventManagement() {
         data={events}
         searchKey={['title', 'coordinator', 'location']}
         filters={[
-          { key: 'status', label: 'Status', options: ['Upcoming', 'Ongoing', 'Completed', 'Cancelled'] },
-          { key: 'category', label: 'Category', options: ['Health Camp', 'Education', 'Cultural', 'Sports', 'Fundraising', 'Community', 'Other'] },
+          { key: 'status', label: 'Status', options: ['Upcoming', 'Ongoing', 'Completed', 'Cancelled'] }
         ]}
       />
       <FormModal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Event' : 'Create Event'} fields={eventFields} values={form} onChange={setForm} onSubmit={handleSave} loading={saving} />

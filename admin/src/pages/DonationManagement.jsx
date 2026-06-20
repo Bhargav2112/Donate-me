@@ -12,13 +12,13 @@ import moment from 'moment';
 
 const donationFields = [
   { key: 'donor_name', label: 'Donor Name', required: true },
-  { key: 'amount', label: 'Amount (₹)', type: 'number', required: true },
-  { key: 'transaction_id', label: 'Transaction ID' },
-  { key: 'donation_date', label: 'Donation Date', type: 'date' },
-  { key: 'payment_method', label: 'Payment Method', type: 'select', options: ['Cash', 'Bank Transfer', 'UPI', 'Credit Card', 'Cheque', 'Online', 'Other'] },
-  { key: 'purpose', label: 'Purpose' },
-  { key: 'notes', label: 'Notes', type: 'textarea' },
-  { key: 'verification_status', label: 'Status', type: 'select', options: ['Pending', 'Verified', 'Rejected', 'Approved'], required: true },
+  { key: 'mobile', label: 'Mobile Number (10 Digits)', required: true },
+  { key: 'amount', label: 'Donation Amount (₹)', type: 'number', required: true },
+  { key: 'transaction_id', label: 'Transaction ID', required: true },
+  { key: 'screenshot', label: 'Transaction Screenshot', type: 'file' },
+  { key: 'donation_date', label: 'Donation Date', type: 'date', required: true },
+  { key: 'notes', label: 'Remarks / Notes', type: 'textarea' },
+  { key: 'verification_status', label: 'Verification Status', type: 'select', options: ['Pending', 'Verified', 'Rejected'], required: true },
 ];
 
 export default function DonationManagement() {
@@ -44,17 +44,43 @@ export default function DonationManagement() {
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (!form.mobile || !/^\d{10}$/.test(form.mobile)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Mobile number must be exactly 10 digits.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!form.amount || Number(form.amount) <= 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'Donation amount must be a positive number.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSaving(true);
-    if (editing) {
-      await base44.entities.Donation.update(editing.id, form);
-      toast({ title: 'Donation updated' });
-    } else {
-      await base44.entities.Donation.create(form);
-      toast({ title: 'Donation recorded' });
+    try {
+      if (editing) {
+        await base44.entities.Donation.update(editing.id, form);
+        toast({ title: 'Donation updated' });
+      } else {
+        await base44.entities.Donation.create(form);
+        toast({ title: 'Donation recorded' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Make sure transaction screenshot is uploaded.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const updateStatus = async (row, status) => {

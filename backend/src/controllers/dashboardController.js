@@ -70,6 +70,63 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+const getPublicStats = async (req, res) => {
+  try {
+    const totalResidents = await Resident.countDocuments({ status: { $in: ['Active', 'Discharged'] } });
+    const dischargedResidents = await Resident.countDocuments({ status: 'Discharged' });
+    const totalVolunteers = await Volunteer.countDocuments();
+    const activeStaff = await Staff.countDocuments({ status: 'Active' });
+
+    // Sum of verified/approved donations
+    const donations = await Donation.find({ verificationStatus: { $in: ['Verified', 'Approved'] } });
+    const totalDonations = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
+
+    const events = await Event.find();
+    const totalEvents = events.length;
+
+    // Automatic Event Status Logic
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let upcomingEvents = 0;
+    let ongoingEvents = 0;
+    let completedEvents = 0;
+
+    events.forEach(e => {
+      const start = new Date(e.startDate || e.date);
+      start.setHours(0, 0, 0, 0);
+      const end = e.endDate ? new Date(e.endDate) : new Date(start);
+      end.setHours(23, 59, 59, 999);
+
+      if (today < start) {
+        upcomingEvents++;
+      } else if (today >= start && today <= end) {
+        ongoingEvents++;
+      } else {
+        completedEvents++;
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalResidents,
+        totalVolunteers,
+        totalDonations,
+        totalEvents,
+        completedEvents,
+        ongoingEvents,
+        upcomingEvents,
+        dischargedResidents,
+        activeStaff
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
-  getDashboardStats
+  getDashboardStats,
+  getPublicStats
 };

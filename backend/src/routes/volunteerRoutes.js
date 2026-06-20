@@ -4,7 +4,8 @@ const {
   getVolunteerById,
   createVolunteer,
   updateVolunteer,
-  deleteVolunteer
+  deleteVolunteer,
+  getPublicVolunteers
 } = require('../controllers/volunteerController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -13,13 +14,15 @@ const upload = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
 
-// Public endpoint for registration
+// Public endpoints
 router.post(
   '/',
   upload.single('photo'),
   volunteerValidator,
   createVolunteer
 );
+
+router.get('/public', getPublicVolunteers);
 
 // Protected endpoints
 router.use(protect);

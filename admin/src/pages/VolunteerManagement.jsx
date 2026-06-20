@@ -11,15 +11,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const volunteerFields = [
+  { key: 'photo', label: 'Volunteer Photo', type: 'file' },
   { key: 'name', label: 'Name', required: true },
-  { key: 'email', label: 'Email', type: 'email' },
-  { key: 'phone', label: 'Phone' },
-  { key: 'skills', label: 'Skills', type: 'textarea', placeholder: 'e.g. Teaching, First Aid, Event Management' },
+  { key: 'mobile', label: 'Mobile Number', required: true },
+  { key: 'email', label: 'Email', type: 'email', required: true },
   { key: 'address', label: 'Address', type: 'textarea' },
-  { key: 'availability', label: 'Availability', type: 'select', options: ['Weekdays', 'Weekends', 'Both', 'Flexible'] },
+  { key: 'skills', label: 'Skills', type: 'textarea', placeholder: 'e.g. Teaching, First Aid, Event Management' },
+  { key: 'interests', label: 'Interests', placeholder: 'e.g. Art, Sports' },
   { key: 'total_hours', label: 'Total Hours', type: 'number' },
-  { key: 'events_participated', label: 'Events Participated', type: 'number' },
-  { key: 'join_date', label: 'Join Date', type: 'date' },
   { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive', 'On Leave'], required: true },
 ];
 
@@ -46,17 +45,34 @@ export default function VolunteerManagement() {
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (!form.mobile || !/^\d{10}$/.test(form.mobile)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Mobile number must be exactly 10 digits.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSaving(true);
-    if (editing) {
-      await base44.entities.Volunteer.update(editing.id, form);
-      toast({ title: 'Volunteer updated' });
-    } else {
-      await base44.entities.Volunteer.create(form);
-      toast({ title: 'Volunteer added' });
+    try {
+      if (editing) {
+        await base44.entities.Volunteer.update(editing.id, form);
+        toast({ title: 'Volunteer updated' });
+      } else {
+        await base44.entities.Volunteer.create(form);
+        toast({ title: 'Volunteer added' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Make sure email is unique and mobile is 10 digits.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {
