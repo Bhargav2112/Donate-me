@@ -30,31 +30,81 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ donations: 0, donors: 0, volunteers: 0, events: 0, staff: 0, residents: 0 });
   const [recentDonations, setRecentDonations] = useState([]);
   const [recentEvents, setRecentEvents] = useState([]);
+  const [chartDonations, setChartDonations] = useState([]);
+  const [chartVolunteers, setChartVolunteers] = useState([]);
+  const [chartEvents, setChartEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
         const [donations, donors, volunteers, events, staff, residents] = await Promise.all([
-          base44.entities.Donation.list('-created_date', 50),
-          base44.entities.Donor.list('-created_date', 50),
-          base44.entities.Volunteer.list('-created_date', 50),
-          base44.entities.Event.list('-created_date', 50),
-          base44.entities.Staff.list('-created_date', 50),
-          base44.entities.Resident.list('-created_date', 50),
+          base44.entities.Donation.list('-created_date', 300),
+          base44.entities.Donor.list('-created_date', 300),
+          base44.entities.Volunteer.list('-created_date', 300),
+          base44.entities.Event.list('-created_date', 300),
+          base44.entities.Staff.list('-created_date', 300),
+          base44.entities.Resident.list('-created_date', 300),
         ]);
-        const totalDonated = donations.reduce((s, d) => s + (d.amount || 0), 0);
+        
+        // Sum verified donations
+        const totalDonated = donations
+          .filter(d => d.verification_status === 'Verified')
+          .reduce((s, d) => s + (d.amount || 0), 0);
+          
         setStats({
           donations: totalDonated,
           donors: donors.length,
-          volunteers: volunteers.filter(v => v.status === 'Active').length,
+          volunteers: volunteers.length,
           events: events.length,
           staff: staff.filter(s => s.status === 'Active').length,
           residents: residents.filter(r => r.status === 'Active').length,
         });
         setRecentDonations(donations.slice(0, 5));
         setRecentEvents(events.slice(0, 5));
-      } catch (e) { /* empty */ }
+
+        // Generate live monthly charts data
+        const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        const donationChart = monthsShort.map((m, idx) => {
+          const total = donations
+            .filter(d => {
+              const date = new Date(d.donation_date || d.created_date);
+              return date.getMonth() === idx && d.verification_status === 'Verified';
+            })
+            .reduce((sum, d) => sum + (d.amount || 0), 0);
+          return { month: m, amount: total };
+        });
+        setChartDonations(donationChart);
+
+        let vRunningCount = 0;
+        const volunteerChart = monthsShort.map((m, idx) => {
+          const joinedThisMonth = volunteers.filter(v => {
+            const date = new Date(v.created_date || v.join_date);
+            return date.getMonth() === idx;
+          }).length;
+          vRunningCount += joinedThisMonth;
+          return { month: m, count: vRunningCount };
+        });
+        setChartVolunteers(volunteerChart);
+
+        const eventChart = monthsShort.map((m, idx) => {
+          const monthEvents = events.filter(e => {
+            const date = new Date(e.startDate || e.date);
+            return date.getMonth() === idx;
+          });
+          const totalAttendees = monthEvents.reduce((sum, e) => sum + (e.attendees || 0), 0);
+          return {
+            month: m,
+            events: monthEvents.length,
+            attendees: totalAttendees
+          };
+        });
+        setChartEvents(eventChart);
+
+      } catch (e) {
+        console.error('Dashboard load failed:', e);
+      }
       setLoading(false);
     };
     load();
@@ -87,7 +137,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         <ChartCard title="Monthly Donations" subtitle="Revenue trend this year">
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={monthlyDonations}>
+            <AreaChart data={chartDonations}>
               <defs>
                 <linearGradient id="donationGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -105,7 +155,7 @@ export default function Dashboard() {
 
         <ChartCard title="Volunteer Growth" subtitle="Monthly new volunteers">
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={volunteerGrowth}>
+            <LineChart data={chartVolunteers}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
@@ -117,7 +167,7 @@ export default function Dashboard() {
 
         <ChartCard title="Event Analytics" subtitle="Events & attendees">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={eventAnalytics}>
+            <BarChart data={chartEvents}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
