@@ -1,4 +1,11 @@
-const BASE_URL = `http://${window.location.hostname}:5000/api`;
+const getBaseUrl = () => {
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
+    return `http://${host}:5000/api`;
+  }
+  return 'https://donate-me-j4ha.onrender.com/api';
+};
+const BASE_URL = getBaseUrl();
 
 const getHeaders = () => {
   const token = localStorage.getItem('mock_access_token') || localStorage.getItem('token');

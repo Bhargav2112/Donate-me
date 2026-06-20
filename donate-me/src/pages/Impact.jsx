@@ -18,7 +18,10 @@ export default function Impact() {
   });
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:5000/api/dashboard/public-stats`)
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.');
+    const apiHost = isLocal ? `http://${host}:5000` : 'https://donate-me-j4ha.onrender.com';
+    fetch(`${apiHost}/api/dashboard/public-stats`)
       .then(res => res.json())
       .then(resData => {
         if (resData && resData.success && resData.data) {

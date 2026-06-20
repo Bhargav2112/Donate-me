@@ -114,7 +114,10 @@ export default function DischargeManagement() {
 
   const handlePrint = (row) => {
     const token = localStorage.getItem('mock_access_token') || localStorage.getItem('token');
-    const url = `http://${window.location.hostname}:5000/api/discharge/${row.id}/receipt?token=${token}`;
+    const host = window.location.hostname;
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.');
+    const apiHost = isLocal ? `http://${host}:5000` : 'https://donate-me-j4ha.onrender.com';
+    const url = `${apiHost}/api/discharge/${row.id}/receipt?token=${token}`;
     
     // Create temporary download anchor link
     const link = document.createElement('a');
