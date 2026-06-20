@@ -23,7 +23,7 @@ export default function Volunteer() {
   });
 
   const fetchVolunteers = () => {
-    fetch('http://localhost:5000/api/volunteers/public')
+    fetch(`http://${window.location.hostname}:5000/api/volunteers/public`)
       .then(res => res.json())
       .then(resData => {
         if (resData && resData.success && resData.data) {

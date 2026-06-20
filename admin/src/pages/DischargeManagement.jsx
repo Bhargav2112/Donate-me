@@ -114,7 +114,7 @@ export default function DischargeManagement() {
 
   const handlePrint = (row) => {
     const token = localStorage.getItem('mock_access_token') || localStorage.getItem('token');
-    const url = `http://localhost:5000/api/discharge/${row.id}/receipt?token=${token}`;
+    const url = `http://${window.location.hostname}:5000/api/discharge/${row.id}/receipt?token=${token}`;
     
     // Create temporary download anchor link
     const link = document.createElement('a');

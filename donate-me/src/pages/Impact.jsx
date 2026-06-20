@@ -18,7 +18,7 @@ export default function Impact() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/dashboard/public-stats')
+    fetch(`http://${window.location.hostname}:5000/api/dashboard/public-stats`)
       .then(res => res.json())
       .then(resData => {
         if (resData && resData.success && resData.data) {
