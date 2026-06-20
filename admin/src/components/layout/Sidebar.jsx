@@ -106,7 +106,7 @@ export default function Sidebar() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className={`hidden lg:flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`}>
+      <aside className={`hidden lg:flex flex-col bg-sidebar border-r border-sidebar-border shrink-0 transition-all duration-300 h-full ${collapsed ? 'w-16' : 'w-60'}`}>
         <NavContent />
         <button
           onClick={() => setCollapsed(!collapsed)}

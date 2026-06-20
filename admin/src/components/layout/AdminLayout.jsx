@@ -8,7 +8,7 @@ export default function AdminLayout() {
   return (
     <ThemeProvider>
       <div className="flex h-screen overflow-hidden bg-background">
-        <div className="relative">
+        <div className="relative h-full">
           <Sidebar />
         </div>
         <div className="flex flex-col flex-1 overflow-hidden">
