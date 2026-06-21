@@ -241,13 +241,12 @@ export default function Volunteer() {
                           <img src={photoPreview} alt="Profile Preview" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex flex-col gap-2">
-                          <button
-                            type="button"
-                            onClick={() => document.getElementById('volunteer-photo')?.click()}
-                            className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors min-h-[32px]"
+                          <label
+                            htmlFor="volunteer-photo"
+                            className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors min-h-[32px] cursor-pointer inline-flex items-center justify-center"
                           >
                             Replace Photo
-                          </button>
+                          </label>
                           <button
                             type="button"
                             onClick={handleRemovePhoto}
