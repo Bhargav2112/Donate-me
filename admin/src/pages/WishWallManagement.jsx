@@ -48,16 +48,24 @@ export default function WishWallManagement() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (editing) {
-      await base44.entities.WishWall.update(editing.id, form);
-      toast({ title: 'Wish updated' });
-    } else {
-      await base44.entities.WishWall.create(form);
-      toast({ title: 'Wish added to wall' });
+    try {
+      if (editing) {
+        await base44.entities.WishWall.update(editing.id, form);
+        toast({ title: 'Wish updated' });
+      } else {
+        await base44.entities.WishWall.create(form);
+        toast({ title: 'Wish added to wall' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Could not save wish details.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const markFulfilled = async (row) => {

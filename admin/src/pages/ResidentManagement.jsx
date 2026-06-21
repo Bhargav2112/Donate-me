@@ -60,17 +60,43 @@ export default function ResidentManagement() {
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (form.informer_mobile && !/^\d{10}$/.test(form.informer_mobile.trim())) {
+      toast({
+        title: 'Validation Error',
+        description: 'Informer Mobile number must be exactly 10 digits.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (form.guardian_mobile && !/^\d{10}$/.test(form.guardian_mobile.trim())) {
+      toast({
+        title: 'Validation Error',
+        description: 'Guardian Mobile number must be exactly 10 digits.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSaving(true);
-    if (editing) {
-      await base44.entities.Resident.update(editing.id, form);
-      toast({ title: 'Resident updated' });
-    } else {
-      await base44.entities.Resident.create(form);
-      toast({ title: 'Resident added' });
+    try {
+      if (editing) {
+        await base44.entities.Resident.update(editing.id, form);
+        toast({ title: 'Resident updated' });
+      } else {
+        await base44.entities.Resident.create(form);
+        toast({ title: 'Resident added' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Could not save resident details.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {

@@ -56,16 +56,24 @@ export default function EventManagement() {
     }
 
     setSaving(true);
-    if (editing) {
-      await base44.entities.Event.update(editing.id, form);
-      toast({ title: 'Event updated' });
-    } else {
-      await base44.entities.Event.create(form);
-      toast({ title: 'Event created' });
+    try {
+      if (editing) {
+        await base44.entities.Event.update(editing.id, form);
+        toast({ title: 'Event updated' });
+      } else {
+        await base44.entities.Event.create(form);
+        toast({ title: 'Event created' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Could not save event details.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {

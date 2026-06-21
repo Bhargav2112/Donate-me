@@ -48,16 +48,24 @@ export default function StaffManagement() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (editing) {
-      await base44.entities.Staff.update(editing.id, form);
-      toast({ title: 'Staff updated' });
-    } else {
-      await base44.entities.Staff.create(form);
-      toast({ title: 'Staff added' });
+    try {
+      if (editing) {
+        await base44.entities.Staff.update(editing.id, form);
+        toast({ title: 'Staff updated' });
+      } else {
+        await base44.entities.Staff.create(form);
+        toast({ title: 'Staff added' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Could not save staff details.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {

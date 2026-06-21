@@ -52,16 +52,24 @@ export default function DonorManagement() {
 
   const handleSave = async () => {
     setSaving(true);
-    if (editing) {
-      await base44.entities.Donor.update(editing.id, form);
-      toast({ title: 'Donor updated' });
-    } else {
-      await base44.entities.Donor.create(form);
-      toast({ title: 'Donor added' });
+    try {
+      if (editing) {
+        await base44.entities.Donor.update(editing.id, form);
+        toast({ title: 'Donor updated' });
+      } else {
+        await base44.entities.Donor.create(form);
+        toast({ title: 'Donor added' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Could not save donor details.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {
