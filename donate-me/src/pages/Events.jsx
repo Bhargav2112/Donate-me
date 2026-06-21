@@ -58,25 +58,25 @@ export default function Events() {
               onClick={() => setActiveTab('all')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              All
+              {t('status_all')}
             </button>
             <button
               onClick={() => setActiveTab('ongoing')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'ongoing' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              Ongoing
+              {t('status_ongoing')}
             </button>
             <button
               onClick={() => setActiveTab('upcoming')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'upcoming' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              {t('upcoming_events') || 'Upcoming'}
+              {t('status_upcoming')}
             </button>
             <button
               onClick={() => setActiveTab('completed')}
               className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors min-h-[44px] ${activeTab === 'completed' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
             >
-              {t('completed_events') || 'Completed'}
+              {t('status_completed')}
             </button>
           </div>
 
@@ -108,7 +108,7 @@ export default function Events() {
                         event.status?.toLowerCase() === 'completed' ? 'bg-zinc-500 text-white' :
                         'bg-red-500 text-white'
                       }`}>
-                        {event.status || 'Upcoming'}
+                        {t('status_' + event.status?.toLowerCase()) || event.status}
                       </span>
                     </div>
                     <div className="p-6 flex flex-col flex-1">

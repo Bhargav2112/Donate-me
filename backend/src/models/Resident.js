@@ -6,7 +6,7 @@ const residentSchema = new mongoose.Schema({
   admissionDate: { type: Date, required: true },
   admissionTime: { type: String, default: '' },
   name: { type: String, required: true, trim: true }, // Full Name
-  age: { type: Number, required: true },
+  age: { type: Number, required: true, min: 0 },
   fatherHusbandName: { type: String, default: '' },
   gender: {
     type: String,

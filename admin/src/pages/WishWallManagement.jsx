@@ -8,6 +8,7 @@ import DataTable from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import FormModal from '@/components/shared/FormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import ActionTooltip from '@/components/shared/ActionTooltip';
 import moment from 'moment';
 
 const wishFields = [
@@ -15,6 +16,8 @@ const wishFields = [
   { key: 'description', label: 'Description', type: 'textarea' },
   { key: 'category', label: 'Category', type: 'select', options: ['Medical', 'Education', 'Food', 'Clothing', 'Infrastructure', 'Equipment', 'Other'], required: true },
   { key: 'priority', label: 'Priority', type: 'select', options: ['Low', 'Medium', 'High', 'Urgent'], required: true },
+  { key: 'quantity', label: 'Quantity Needed', type: 'number', required: true },
+  { key: 'fulfilled_count', label: 'Fulfilled Count', type: 'number' },
   { key: 'estimated_cost', label: 'Estimated Cost (₹)', type: 'number' },
   { key: 'requested_by', label: 'Requested By' },
   { key: 'target_date', label: 'Target Date', type: 'date' },
@@ -40,7 +43,7 @@ export default function WishWallManagement() {
 
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setEditing(null); setForm({ status: 'Open', priority: 'Medium' }); setModalOpen(true); };
+  const openAdd = () => { setEditing(null); setForm({ status: 'Open', priority: 'Medium', quantity: 1, fulfilled_count: 0 }); setModalOpen(true); };
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
@@ -58,7 +61,7 @@ export default function WishWallManagement() {
   };
 
   const markFulfilled = async (row) => {
-    await base44.entities.WishWall.update(row.id, { status: 'Fulfilled' });
+    await base44.entities.WishWall.update(row.id, { status: 'Fulfilled', fulfilled_count: row.quantity });
     toast({ title: 'Wish marked as fulfilled!' });
     load();
   };
@@ -71,33 +74,33 @@ export default function WishWallManagement() {
   };
 
   const columns = [
-    { key: 'title', label: 'Requirement', render: (val, row) => (
-      <div>
-        <p className="font-medium text-sm">{val}</p>
-        {row.description && <p className="text-xs text-muted-foreground line-clamp-1">{row.description}</p>}
-      </div>
-    )},
-    { key: 'category', label: 'Category' },
+    { key: 'title', label: 'Requirement Name', render: val => <span className="font-semibold text-sm">{val}</span> },
+    { key: 'description', label: 'Description', render: val => <span className="text-xs text-muted-foreground">{val || '—'}</span> },
     { key: 'priority', label: 'Priority', render: val => <StatusBadge status={val} /> },
-    { key: 'estimated_cost', label: 'Est. Cost', render: val => val ? `₹${val.toLocaleString()}` : '—' },
-    { key: 'requested_by', label: 'Requested By', render: val => val || '—' },
-    { key: 'target_date', label: 'Target', render: val => val ? moment(val).format('MMM DD') : '—' },
+    { key: 'quantity', label: 'Quantity', render: val => val || 1 },
+    { key: 'fulfilled_count', label: 'Fulfilled Count', render: val => val || 0 },
     { key: 'status', label: 'Status', render: val => <StatusBadge status={val} /> },
     {
       key: 'actions', label: 'Actions',
       render: (_, row) => (
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
-            <Edit className="w-3.5 h-3.5" />
-          </Button>
-          {row.status !== 'Fulfilled' && row.status !== 'Closed' && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); markFulfilled(row); }}>
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+          <ActionTooltip content="Edit Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
+              <Edit className="w-3.5 h-3.5" />
             </Button>
+          </ActionTooltip>
+          {row.status !== 'Fulfilled' && row.status !== 'Closed' && (
+            <ActionTooltip content="Mark Fulfilled">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); markFulfilled(row); }}>
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              </Button>
+            </ActionTooltip>
           )}
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
-            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-          </Button>
+          <ActionTooltip content="Delete Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
+              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+            </Button>
+          </ActionTooltip>
         </div>
       )
     },

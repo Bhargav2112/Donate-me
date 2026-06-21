@@ -6,8 +6,19 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export default function FormModal({ open, onClose, title, fields, values, onChange, onSubmit, loading }) {
+export default function FormModal({ open, onClose, title, fields, values = {}, onChange, onSubmit, loading }) {
   const handleChange = (key, val) => onChange({ ...values, [key]: val });
+
+  const formatDateForInput = (val) => {
+    if (!val) return '';
+    try {
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+      }
+    } catch (e) {}
+    return val;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -41,19 +52,41 @@ export default function FormModal({ open, onClose, title, fields, values, onChan
               ) : f.type === 'file' ? (
                 <div className="space-y-2">
                   {values[f.key] ? (
-                    <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-border group bg-muted flex items-center justify-center">
-                      <img
-                        src={typeof values[f.key] === 'string' ? values[f.key] : URL.createObjectURL(values[f.key])}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleChange(f.key, '')}
-                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-semibold"
-                      >
-                        Remove
-                      </button>
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center">
+                        <img
+                          src={typeof values[f.key] === 'string' ? values[f.key] : URL.createObjectURL(values[f.key])}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => e.target.files[0] && handleChange(f.key, e.target.files[0])}
+                          className="hidden"
+                          id={`file-replace-${f.key}`}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById(`file-replace-${f.key}`).click()}
+                          className="text-xs h-8"
+                        >
+                          Replace Image
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleChange(f.key, '')}
+                          className="text-xs h-8"
+                        >
+                          Remove Image
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <Input
@@ -67,8 +100,16 @@ export default function FormModal({ open, onClose, title, fields, values, onChan
               ) : (
                 <Input
                   type={f.type || 'text'}
-                  value={values[f.key] || ''}
-                  onChange={e => handleChange(f.key, f.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value)}
+                  value={f.type === 'date' ? formatDateForInput(values[f.key]) : (values[f.key] || '')}
+                  onChange={e => {
+                    const rawVal = e.target.value;
+                    let val = rawVal;
+                    if (f.type === 'number') {
+                      val = rawVal === '' ? '' : Math.max(0, Number(rawVal));
+                    }
+                    handleChange(f.key, val);
+                  }}
+                  min={f.type === 'number' ? 0 : undefined}
                   placeholder={f.placeholder || ''}
                   required={f.required}
                   className="h-9 text-sm"

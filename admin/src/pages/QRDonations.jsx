@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/shared/PageHeader';
 import FormModal from '@/components/shared/FormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import ActionTooltip from '@/components/shared/ActionTooltip';
 import { Switch } from '@/components/ui/switch';
 
 const qrFields = [
@@ -40,17 +41,48 @@ export default function QRDonations() {
   const openEdit = (item) => { setEditing(item); setForm({ ...item }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (form.account_number) {
+      if (!/^\d{8,17}$/.test(form.account_number)) {
+        toast({
+          title: 'Validation Error',
+          description: 'Account Number must be between 8 and 17 digits and contain numbers only.',
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+
+    if (form.ifsc_code) {
+      const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/i;
+      if (!ifscRegex.test(form.ifsc_code)) {
+        toast({
+          title: 'Validation Error',
+          description: 'IFSC Code must be exactly 11 characters in a valid format (e.g. SBIN0001234).',
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+
     setSaving(true);
-    if (editing) {
-      await base44.entities.QRDonation.update(editing.id, form);
-      toast({ title: 'QR details updated' });
-    } else {
-      await base44.entities.QRDonation.create(form);
-      toast({ title: 'QR donation account added' });
+    try {
+      if (editing) {
+        await base44.entities.QRDonation.update(editing.id, form);
+        toast({ title: 'QR details updated' });
+      } else {
+        await base44.entities.QRDonation.create(form);
+        toast({ title: 'QR donation account added' });
+      }
+      setModalOpen(false);
+      load();
+    } catch (e) {
+      toast({
+        title: 'Save failed',
+        description: e.message || 'Make sure details are valid.',
+        variant: 'destructive'
+      });
     }
     setSaving(false);
-    setModalOpen(false);
-    load();
   };
 
   const handleDelete = async () => {
@@ -118,12 +150,16 @@ export default function QRDonations() {
               </div>
 
               <div className="flex gap-2 pt-2 border-t border-border">
-                <Button variant="outline" size="sm" className="flex-1 text-xs h-8" onClick={() => openEdit(qr)}>
-                  <Edit className="w-3 h-3 mr-1" />Edit
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-8 text-destructive" onClick={() => setDeleteTarget(qr)}>
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+                <ActionTooltip content="Edit Record">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8" onClick={() => openEdit(qr)}>
+                    <Edit className="w-3 h-3 mr-1" />Edit
+                  </Button>
+                </ActionTooltip>
+                <ActionTooltip content="Delete Record">
+                  <Button variant="outline" size="sm" className="text-xs h-8 text-destructive" onClick={() => setDeleteTarget(qr)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </ActionTooltip>
               </div>
             </div>
           ))}

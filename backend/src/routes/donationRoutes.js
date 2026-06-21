@@ -17,7 +17,6 @@ const router = express.Router();
 // POST is public to allow consumer-facing "donate-me" platform to register donations
 router.post(
   '/',
-  upload.single('screenshot'),
   donationValidator,
   createDonation
 );
@@ -33,7 +32,6 @@ router.get('/:id/receipt', getDonationReceipt);
 router.put(
   '/:id',
   authorize('Super Admin', 'Admin', 'Accountant'),
-  upload.single('screenshot'),
   donationValidator,
   updateDonation
 );

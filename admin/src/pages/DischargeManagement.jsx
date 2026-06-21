@@ -7,6 +7,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import DataTable from '@/components/shared/DataTable';
 import FormModal from '@/components/shared/FormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import ActionTooltip from '@/components/shared/ActionTooltip';
 import moment from 'moment';
 
 export default function DischargeManagement() {
@@ -170,15 +171,21 @@ export default function DischargeManagement() {
       key: 'actions', label: 'Actions',
       render: (_, row) => (
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePrint(row)} title="Print Form">
-            <Printer className="w-3.5 h-3.5 text-primary" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(row)} title="Edit Record">
-            <Edit className="w-3.5 h-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteTarget(row)} title="Delete Discharge">
-            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-          </Button>
+          <ActionTooltip content="Print Form">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); handlePrint(row); }}>
+              <Printer className="w-3.5 h-3.5 text-primary" />
+            </Button>
+          </ActionTooltip>
+          <ActionTooltip content="Edit Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
+              <Edit className="w-3.5 h-3.5" />
+            </Button>
+          </ActionTooltip>
+          <ActionTooltip content="Delete Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
+              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+            </Button>
+          </ActionTooltip>
         </div>
       )
     }

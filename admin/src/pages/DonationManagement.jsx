@@ -8,6 +8,7 @@ import DataTable from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import FormModal from '@/components/shared/FormModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ActionTooltip from '@/components/shared/ActionTooltip';
 import moment from 'moment';
 
 const donationFields = [
@@ -44,6 +45,15 @@ export default function DonationManagement() {
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
 
   const handleSave = async () => {
+    if (!form.donor_name || !form.donor_name.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Donor Name is required.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     if (!form.mobile || !/^\d{10}$/.test(form.mobile)) {
       toast({
         title: 'Validation Error',
@@ -57,6 +67,24 @@ export default function DonationManagement() {
       toast({
         title: 'Validation Error',
         description: 'Donation amount must be a positive number.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!form.transaction_id || !form.transaction_id.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Transaction ID is required.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!form.donation_date) {
+      toast({
+        title: 'Validation Error',
+        description: 'Donation Date is required.',
         variant: 'destructive'
       });
       return;
@@ -103,20 +131,28 @@ export default function DonationManagement() {
       key: 'actions', label: 'Actions',
       render: (_, row) => (
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDetailItem(row); }}>
-            <Eye className="w-3.5 h-3.5" />
-          </Button>
+          <ActionTooltip content="View Details">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDetailItem(row); }}>
+              <Eye className="w-3.5 h-3.5" />
+            </Button>
+          </ActionTooltip>
           {row.verification_status === 'Pending' && (
             <>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Verified'); }}>
-                <Shield className="w-3.5 h-3.5 text-blue-500" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Approved'); }}>
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Rejected'); }}>
-                <XCircle className="w-3.5 h-3.5 text-red-500" />
-              </Button>
+              <ActionTooltip content="Mark Verified">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Verified'); }}>
+                  <Shield className="w-3.5 h-3.5 text-blue-500" />
+                </Button>
+              </ActionTooltip>
+              <ActionTooltip content="Mark Approved">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Approved'); }}>
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                </Button>
+              </ActionTooltip>
+              <ActionTooltip content="Mark Rejected">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); updateStatus(row, 'Rejected'); }}>
+                  <XCircle className="w-3.5 h-3.5 text-red-500" />
+                </Button>
+              </ActionTooltip>
             </>
           )}
         </div>

@@ -298,7 +298,8 @@ const volunteerSerializers = {
     address: p.address || '',
     skills: Array.isArray(p.skills) ? p.skills : (p.skills ? p.skills.split(',').map(s => s.trim()) : []),
     interests: Array.isArray(p.interests) ? p.interests : (p.interests ? p.interests.split(',').map(i => i.trim()) : []),
-    totalHours: Number(p.total_hours || p.totalHours) || 0
+    totalHours: Number(p.total_hours || p.totalHours) || 0,
+    status: p.status || 'Active'
   }),
   toFrontend: (i) => ({
     id: i._id,
@@ -314,6 +315,7 @@ const volunteerSerializers = {
     interests: Array.isArray(i.interests) ? i.interests.join(', ') : i.interests,
     total_hours: i.totalHours,
     totalHours: i.totalHours,
+    status: i.status || 'Active',
     created_date: i.createdAt,
     join_date: i.createdAt
   })
@@ -367,7 +369,7 @@ const eventSerializers = {
 const wishWallSerializers = {
   toBackend: (p) => ({
     title: p.title || p.wish_item || 'Welfare Need',
-    quantity: 1,
+    quantity: Number(p.quantity) || 1,
     priority: p.priority || 'Medium',
     status: p.status === 'Open' ? 'Pending' : (p.status === 'In Progress' ? 'Partially Fulfilled' : (p.status === 'Closed' ? 'Fulfilled' : (p.status || 'Pending'))),
     description: JSON.stringify({
@@ -375,7 +377,9 @@ const wishWallSerializers = {
       category: p.category || 'Other',
       estimated_cost: Number(p.estimated_cost) || 0,
       requested_by: p.requested_by || 'Staff',
-      target_date: p.target_date || ''
+      target_date: p.target_date || '',
+      quantity_needed: Number(p.quantity) || 1,
+      quantity_fulfilled: Number(p.fulfilled_count) || 0
     })
   }),
   toFrontend: (i) => {
@@ -388,13 +392,15 @@ const wishWallSerializers = {
     return {
       id: i._id,
       title: i.title,
-      description: extra.description || i.description,
+      description: extra.description !== undefined ? extra.description : '',
       category: extra.category || 'Other',
       estimated_cost: extra.estimated_cost || 0,
       requested_by: extra.requested_by || 'Staff',
       target_date: extra.target_date || '',
       priority: i.priority,
       status: i.status === 'Pending' ? 'Open' : (i.status === 'Partially Fulfilled' ? 'In Progress' : i.status),
+      quantity: i.quantity || extra.quantity_needed || 1,
+      fulfilled_count: extra.quantity_fulfilled || 0,
       created_date: i.createdAt
     };
   }
@@ -440,6 +446,34 @@ const auditLogSerializers = {
     action: i.action,
     details: typeof i.details === 'object' ? JSON.stringify(i.details) : i.details,
     created_date: i.timestamp
+  })
+};
+
+const qrConfigSerializers = {
+  toBackend: (p) => ({
+    bankName: p.bank_name || '',
+    accountHolder: p.account_holder || '',
+    accountNumber: p.account_number || '',
+    ifscCode: p.ifsc_code || '',
+    upiId: p.upi_id || '',
+    upiName: p.bank_name || '',
+    totalReceived: Number(p.total_received) || 0,
+    qrImage: p.qr_image || '',
+    isActive: p.is_active !== undefined ? p.is_active : true
+  }),
+  toFrontend: (i) => ({
+    id: i._id,
+    bank_name: i.bankName || i.upiName || '',
+    account_holder: i.accountHolder || '',
+    account_number: i.accountNumber || '',
+    ifsc_code: i.ifscCode || '',
+    upi_id: i.upiId || '',
+    upiName: i.upiName || '',
+    total_received: i.totalReceived || 0,
+    qr_image: i.qrImage || '',
+    is_active: i.isActive,
+    status: i.isActive ? 'Active' : 'Inactive',
+    created_date: i.createdAt
   })
 };
 
@@ -574,7 +608,9 @@ export const base44 = {
     Event: new HttpEntity('/events', 'Event', eventSerializers),
     WishWall: new HttpEntity('/requirements', 'WishWall', wishWallSerializers),
     Discharge: new HttpEntity('/discharge', 'Discharge', dischargeSerializers),
-    QRDonation: qrEntity,
+    QRDonation: new HttpEntity('/qr', 'QRDonation', qrConfigSerializers),
+    RequirementContribution: new HttpEntity('/contributions', 'RequirementContribution'),
+    ContactMessage: new HttpEntity('/messages', 'ContactMessage'),
     AuditLog: new HttpEntity('/dashboard', 'AuditLog', { toFrontend: auditLogSerializers.toFrontend }) // Reads from activity log populated inside dashboard metrics
   },
   integrations: {

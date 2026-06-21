@@ -297,7 +297,8 @@ const volunteerSerializers = {
     address: p.address || '',
     skills: Array.isArray(p.skills) ? p.skills : (p.skills ? p.skills.split(',').map(s => s.trim()) : []),
     interests: Array.isArray(p.interests) ? p.interests : (p.interests ? p.interests.split(',').map(i => i.trim()) : []),
-    totalHours: Number(p.total_hours || p.totalHours) || 0
+    totalHours: Number(p.total_hours || p.totalHours) || 0,
+    status: p.status || 'Active'
   }),
   toFrontend: (i) => ({
     id: i._id,
@@ -313,6 +314,7 @@ const volunteerSerializers = {
     interests: Array.isArray(i.interests) ? i.interests.join(', ') : i.interests,
     total_hours: i.totalHours,
     totalHours: i.totalHours,
+    status: i.status || 'Active',
     created_date: i.createdAt,
     join_date: i.createdAt
   })
@@ -409,6 +411,34 @@ const auditLogSerializers = {
   })
 };
 
+const qrConfigSerializers = {
+  toBackend: (p) => ({
+    bankName: p.bank_name || '',
+    accountHolder: p.account_holder || '',
+    accountNumber: p.account_number || '',
+    ifscCode: p.ifsc_code || '',
+    upiId: p.upi_id || '',
+    upiName: p.bank_name || '',
+    totalReceived: Number(p.total_received) || 0,
+    qrImage: p.qr_image || '',
+    isActive: p.is_active !== undefined ? p.is_active : true
+  }),
+  toFrontend: (i) => ({
+    id: i._id,
+    bank_name: i.bankName || i.upiName || '',
+    account_holder: i.accountHolder || '',
+    account_number: i.accountNumber || '',
+    ifsc_code: i.ifscCode || '',
+    upi_id: i.upiId || '',
+    upiName: i.upiName || '',
+    total_received: i.totalReceived || 0,
+    qr_image: i.qrImage || '',
+    is_active: i.isActive,
+    status: i.isActive ? 'Active' : 'Inactive',
+    created_date: i.createdAt
+  })
+};
+
 const wishItemSerializers = {
   toBackend: (p) => ({
     title: p.title_en || p.title || 'Welfare Need',
@@ -457,7 +487,7 @@ const wishItemSerializers = {
       title_en: extra.title_en || i.title || '',
       title_gu: extra.title_gu || i.title || '',
       title_hi: extra.title_hi || i.title || '',
-      description_en: extra.description_en || extra.description || i.description || '',
+      description_en: extra.description_en !== undefined ? extra.description_en : (extra.description !== undefined ? extra.description : ''),
       description_gu: extra.description_gu || '',
       description_hi: extra.description_hi || '',
       category: cat,
@@ -607,8 +637,9 @@ export const base44 = {
     Event: new HttpEntity('/events', 'Event', eventSerializers),
     WishWall: new HttpEntity('/requirements', 'WishWall', wishWallSerializers),
     WishItem: new HttpEntity('/requirements', 'WishItem', wishItemSerializers),
-    ContactMessage: contactMessageEntity,
-    QRDonation: qrEntity,
+    ContactMessage: new HttpEntity('/messages', 'ContactMessage'),
+    QRDonation: new HttpEntity('/qr', 'QRDonation', qrConfigSerializers),
+    RequirementContribution: new HttpEntity('/contributions', 'RequirementContribution'),
     AuditLog: new HttpEntity('/dashboard', 'AuditLog', { toFrontend: auditLogSerializers.toFrontend })
   },
   integrations: {

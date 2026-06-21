@@ -24,8 +24,8 @@ const getVolunteerById = async (req, res) => {
 
 const createVolunteer = async (req, res) => {
   try {
-    let { volunteerId, fullName, mobile, email, address, skills, interests, totalHours } = req.body;
-
+    let { volunteerId, fullName, mobile, email, address, skills, interests, totalHours, status } = req.body;
+ 
     // Generate unique sequential Volunteer ID if not provided
     if (!volunteerId || volunteerId.trim() === '') {
       const lastVolunteer = await Volunteer.findOne({}, {}, { sort: { volunteerId: -1 } });
@@ -38,7 +38,7 @@ const createVolunteer = async (req, res) => {
       }
       volunteerId = `VOL-${String(nextNum).padStart(3, '0')}`;
     }
-
+ 
     const existingVolunteer = await Volunteer.findOne({
       $or: [{ volunteerId }, { email }]
     });
@@ -48,16 +48,16 @@ const createVolunteer = async (req, res) => {
         message: 'Volunteer with this Volunteer ID or Email already exists'
       });
     }
-
+ 
     let photoUrl = req.body.photo || req.body.photoUrl || '';
     if (req.file) {
       photoUrl = await uploadToCloudinary(req.file.path, 'volunteers');
     }
-
+ 
     // Support skills and interests as array or comma-separated string
     const parsedSkills = Array.isArray(skills) ? skills : (skills ? skills.split(',').map(s => s.trim()) : []);
     const parsedInterests = Array.isArray(interests) ? interests : (interests ? interests.split(',').map(i => i.trim()) : []);
-
+ 
     const newVolunteer = await Volunteer.create({
       volunteerId,
       photo: photoUrl,
@@ -67,7 +67,8 @@ const createVolunteer = async (req, res) => {
       address: address || '',
       skills: parsedSkills,
       interests: parsedInterests,
-      totalHours: Number(totalHours) || 0
+      totalHours: Number(totalHours) || 0,
+      status: status || 'Active'
     });
 
     req.logAction = `Registered volunteer: ${newVolunteer.fullName}`;
@@ -86,7 +87,7 @@ const updateVolunteer = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Volunteer not found' });
     }
 
-    const { volunteerId, fullName, mobile, email, address, skills, interests, totalHours } = req.body;
+    const { volunteerId, fullName, mobile, email, address, skills, interests, totalHours, status } = req.body;
 
     if (volunteerId || email) {
       const query = [];
@@ -123,7 +124,8 @@ const updateVolunteer = async (req, res) => {
         address: address !== undefined ? address : volunteer.address,
         skills: parsedSkills,
         interests: parsedInterests,
-        totalHours: totalHours !== undefined ? Number(totalHours) : volunteer.totalHours
+        totalHours: totalHours !== undefined ? Number(totalHours) : volunteer.totalHours,
+        status: status !== undefined ? status : volunteer.status
       },
       { new: true, runValidators: true }
     );

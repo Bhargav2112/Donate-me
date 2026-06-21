@@ -17,7 +17,6 @@ const router = express.Router();
 // Public endpoints
 router.post(
   '/',
-  upload.single('photo'),
   volunteerValidator,
   createVolunteer
 );
@@ -34,7 +33,6 @@ router.get('/:id', getVolunteerById);
 router.put(
   '/:id',
   authorize('Super Admin', 'Admin', 'Manager', 'Volunteer Coordinator'),
-  upload.single('photo'),
   volunteerValidator,
   updateVolunteer
 );

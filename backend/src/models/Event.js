@@ -20,10 +20,10 @@ const eventSchema = new mongoose.Schema({
   },
   category: { type: String, default: 'Other' },
   coordinator: { type: String, default: '' },
-  budget: { type: Number, default: 0 },
-  spent: { type: Number, default: 0 },
-  volunteers_assigned: { type: Number, default: 0 },
-  attendees: { type: Number, default: 0 }
+  budget: { type: Number, default: 0, min: 0 },
+  spent: { type: Number, default: 0, min: 0 },
+  volunteers_assigned: { type: Number, default: 0, min: 0 },
+  attendees: { type: Number, default: 0, min: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

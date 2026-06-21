@@ -22,7 +22,6 @@ router.get('/:id', getResidentById);
 router.post(
   '/',
   authorize('Super Admin', 'Admin', 'Manager'),
-  upload.single('photo'),
   residentValidator,
   createResident
 );
@@ -30,7 +29,6 @@ router.post(
 router.put(
   '/:id',
   authorize('Super Admin', 'Admin', 'Manager'),
-  upload.single('photo'),
   residentValidator,
   updateResident
 );

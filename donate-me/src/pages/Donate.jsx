@@ -116,10 +116,10 @@ export default function Donate() {
   };
 
   const bankRows = [
-    { label: t('bank_name'), value: BANK_INFO.bank_name_value, key: 'bank' },
-    { label: t('account_no'), value: BANK_INFO.account_no_value, key: 'acc' },
-    { label: t('ifsc_code'), value: BANK_INFO.ifsc_value, key: 'ifsc' },
-    { label: t('upi_id'), value: BANK_INFO.upi_value, key: 'upi' },
+    { label: t('bank_name'), value: qrConfig?.bank_name || BANK_INFO.bank_name_value, key: 'bank' },
+    { label: t('account_no'), value: qrConfig?.account_number || BANK_INFO.account_no_value, key: 'acc' },
+    { label: t('ifsc_code'), value: qrConfig?.ifsc_code || BANK_INFO.ifsc_value, key: 'ifsc' },
+    { label: t('upi_id'), value: qrConfig?.upi_id || BANK_INFO.upi_value, key: 'upi' },
   ];
 
   if (submitted) {
@@ -249,18 +249,51 @@ export default function Donate() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">{t('field_screenshot')}</label>
-                    <div
-                      onDragOver={e => e.preventDefault()}
-                      onDrop={handleDrop}
-                      onClick={() => fileRef.current?.click()}
-                      className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-secondary/40 transition-colors"
-                    >
-                      <Upload className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">
-                        {fileName || t('drag_drop')}
-                      </p>
-                      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-                    </div>
+                    {fileObj ? (
+                      <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/20">
+                        <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center">
+                          <img
+                            src={URL.createObjectURL(fileObj)}
+                            alt="Screenshot Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileRef.current?.click()}
+                            className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors min-h-[32px]"
+                          >
+                            Replace Image
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFileObj(null);
+                              setFileName('');
+                              if (fileRef.current) fileRef.current.value = '';
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/90 transition-colors min-h-[32px]"
+                          >
+                            Remove Image
+                          </button>
+                        </div>
+                        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+                      </div>
+                    ) : (
+                      <div
+                        onDragOver={e => e.preventDefault()}
+                        onDrop={handleDrop}
+                        onClick={() => fileRef.current?.click()}
+                        className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-secondary/40 transition-colors"
+                      >
+                        <Upload className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          {fileName || t('drag_drop')}
+                        </p>
+                        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+                      </div>
+                    )}
                   </div>
                   <button
                     type="submit"

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Home, Heart, UserCheck, Calendar,
   Star, FileText, Award, QrCode, BarChart3, ChevronLeft, ChevronRight,
-  LogOut, Menu, X, HandCoins, UserPlus
+  LogOut, Menu, X, HandCoins, UserPlus, MessageSquare
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -17,6 +17,7 @@ const navItems = [
   { label: 'Volunteers', icon: UserCheck, path: '/volunteers' },
   { label: 'Events', icon: Calendar, path: '/events' },
   { label: 'Wish Wall', icon: Star, path: '/wish-wall' },
+  { label: 'Messages', icon: MessageSquare, path: '/messages' },
   { label: 'Reports', icon: FileText, path: '/reports' },
   { label: 'Certificates', icon: Award, path: '/certificates' },
   { label: 'QR Donations', icon: QrCode, path: '/qr-donations' },

@@ -9,7 +9,8 @@ const volunteerSchema = new mongoose.Schema({
   address: { type: String, default: '', trim: true },
   skills: [{ type: String, trim: true }],
   interests: [{ type: String, trim: true }],
-  totalHours: { type: Number, default: 0, min: 0 }
+  totalHours: { type: Number, default: 0, min: 0 },
+  status: { type: String, enum: ['Active', 'Inactive', 'On Leave'], default: 'Active' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Volunteer', volunteerSchema);

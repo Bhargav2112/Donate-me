@@ -9,6 +9,7 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import FormModal from '@/components/shared/FormModal';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import ActionTooltip from '@/components/shared/ActionTooltip';
 
 const volunteerFields = [
   { key: 'photo', label: 'Volunteer Photo', type: 'file' },
@@ -115,17 +116,23 @@ export default function VolunteerManagement() {
       key: 'actions', label: 'Actions',
       render: (_, row) => (
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
-            <Edit className="w-3.5 h-3.5" />
-          </Button>
-          {!row.certificate_issued && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); issueCertificate(row); }}>
-              <Award className="w-3.5 h-3.5 text-amber-500" />
+          <ActionTooltip content="Edit Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(row); }}>
+              <Edit className="w-3.5 h-3.5" />
             </Button>
+          </ActionTooltip>
+          {!row.certificate_issued && (
+            <ActionTooltip content="Issue Certificate">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); issueCertificate(row); }}>
+                <Award className="w-3.5 h-3.5 text-amber-500" />
+              </Button>
+            </ActionTooltip>
           )}
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
-            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-          </Button>
+          <ActionTooltip content="Delete Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
+              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+            </Button>
+          </ActionTooltip>
         </div>
       )
     },

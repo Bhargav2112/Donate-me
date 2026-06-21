@@ -122,6 +122,8 @@ const updateResident = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resident not found' });
     }
 
+    const oldStatus = resident.status;
+
     const {
       residentId,
       name,
@@ -196,6 +198,29 @@ const updateResident = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
+
+    // Synchronize discharge status changes
+    const Discharge = require('../models/Discharge');
+    if (oldStatus === 'Active' && updatedResident.status === 'Discharged') {
+      const existingDischarge = await Discharge.findOne({ residentId: updatedResident._id });
+      if (!existingDischarge) {
+        await Discharge.create({
+          residentId: updatedResident._id,
+          residentName: updatedResident.name,
+          address: updatedResident.address || 'Ashram Campus',
+          village: 'Surat',
+          taluka: 'Surat',
+          mobile: updatedResident.guardianMobile || '0000000000',
+          date: new Date(),
+          takingResponsibilityPerson: updatedResident.guardianName || 'Guardian',
+          relationship: 'Guardian',
+          responsibilityAddress: updatedResident.guardianAddress || updatedResident.address || 'Surat',
+          signature: ''
+        });
+      }
+    } else if (oldStatus === 'Discharged' && updatedResident.status === 'Active') {
+      await Discharge.deleteMany({ residentId: updatedResident._id });
+    }
 
     req.logAction = `Updated resident entry: ${updatedResident.name}`;
     req.logDetails = { residentId: updatedResident._id, residentCustomId: updatedResident.residentId };

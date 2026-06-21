@@ -88,6 +88,11 @@ export default function Volunteer() {
     setPhotoPreview('');
   };
 
+  const initialForm = {
+    full_name: '', mobile: '', email: '', address: '',
+    skills: [], interests: '', availability: 'weekdays',
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.full_name.trim()) {
@@ -111,7 +116,9 @@ export default function Volunteer() {
         photo: photo_url
       });
       setSubmitting(false);
-      setSubmitted(true);
+      setForm(initialForm);
+      setPhotoFile(null);
+      setPhotoPreview('');
       toast({ description: t('success_msg') });
       
       // Refresh local list
@@ -125,20 +132,6 @@ export default function Volunteer() {
       setSubmitting(false);
     }
   };
-
-  if (submitted) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-10 h-10 text-secondary" />
-          </div>
-          <h2 className="font-heading text-2xl font-bold text-foreground mb-3">{t('success_msg')}</h2>
-          <p className="text-muted-foreground">{t('volunteer_desc')}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -243,20 +236,39 @@ export default function Volunteer() {
                   <label className="block text-sm font-medium text-foreground mb-2">Profile Photo</label>
                   <div className="flex items-center gap-4">
                     {photoPreview ? (
-                      <div className="w-16 h-16 rounded-xl overflow-hidden border border-border bg-muted flex-shrink-0 relative group">
-                        <img src={photoPreview} alt="Profile Preview" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={handleRemovePhoto}
-                          className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-xs"
-                        >
-                          Remove
-                        </button>
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden border border-border bg-muted flex-shrink-0">
+                          <img src={photoPreview} alt="Profile Preview" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById('volunteer-photo')?.click()}
+                            className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors min-h-[32px]"
+                          >
+                            Replace Photo
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleRemovePhoto}
+                            className="px-3 py-1.5 rounded-lg bg-destructive text-white text-xs font-semibold hover:bg-destructive/90 transition-colors min-h-[32px]"
+                          >
+                            Remove Photo
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <div className="w-16 h-16 rounded-xl border border-dashed border-border bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground text-xs">
-                        No Photo
-                      </div>
+                      <>
+                        <div className="w-16 h-16 rounded-xl border border-dashed border-border bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground text-xs">
+                          No Photo
+                        </div>
+                        <label
+                          htmlFor="volunteer-photo"
+                          className="px-4 py-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-sm font-medium cursor-pointer transition-colors min-h-[40px] flex items-center"
+                        >
+                          Upload Photo
+                        </label>
+                      </>
                     )}
                     <input
                       type="file"
@@ -265,12 +277,6 @@ export default function Volunteer() {
                       className="hidden"
                       id="volunteer-photo"
                     />
-                    <label
-                      htmlFor="volunteer-photo"
-                      className="px-4 py-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-sm font-medium cursor-pointer transition-colors"
-                    >
-                      Upload Photo
-                    </label>
                   </div>
                 </div>
 

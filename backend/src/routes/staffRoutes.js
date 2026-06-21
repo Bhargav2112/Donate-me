@@ -23,7 +23,6 @@ router.get('/:id', getStaffById);
 router.post(
   '/',
   authorize('Super Admin', 'Admin'),
-  upload.single('photo'),
   staffValidator,
   createStaff
 );
@@ -31,7 +30,6 @@ router.post(
 router.put(
   '/:id',
   authorize('Super Admin', 'Admin'),
-  upload.single('photo'),
   staffValidator,
   updateStaff
 );
