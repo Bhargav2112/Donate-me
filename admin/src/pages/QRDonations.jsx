@@ -93,14 +93,14 @@ export default function QRDonations() {
   };
 
   const toggleActive = async (item) => {
-    await base44.entities.QRDonation.update(item.id, { is_active: !item.is_active });
+    await base44.entities.QRDonation.update(item.id, { ...item, is_active: !item.is_active });
     toast({ title: item.is_active ? 'Account deactivated' : 'Account activated' });
     load();
   };
 
   const uploadQR = async (item, file) => {
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    await base44.entities.QRDonation.update(item.id, { qr_image: file_url });
+    await base44.entities.QRDonation.update(item.id, { ...item, qr_image: file_url });
     toast({ title: 'QR code uploaded' });
     load();
   };

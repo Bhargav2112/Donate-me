@@ -77,7 +77,7 @@ export default function StaffManagement() {
 
   const toggleStatus = async (row) => {
     const newStatus = row.status === 'Active' ? 'Inactive' : 'Active';
-    await base44.entities.Staff.update(row.id, { status: newStatus });
+    await base44.entities.Staff.update(row.id, { ...row, status: newStatus });
     toast({ title: `Staff status updated to ${newStatus}` });
     load();
   };

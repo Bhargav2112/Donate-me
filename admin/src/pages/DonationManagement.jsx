@@ -19,7 +19,7 @@ const donationFields = [
   { key: 'screenshot', label: 'Transaction Screenshot', type: 'file' },
   { key: 'donation_date', label: 'Donation Date', type: 'date', required: true },
   { key: 'notes', label: 'Remarks / Notes', type: 'textarea' },
-  { key: 'verification_status', label: 'Verification Status', type: 'select', options: ['Pending', 'Verified', 'Rejected'], required: true },
+  { key: 'verification_status', label: 'Verification Status', type: 'select', options: ['Pending', 'Verified', 'Rejected', 'Approved'], required: true },
 ];
 
 export default function DonationManagement() {
@@ -112,7 +112,7 @@ export default function DonationManagement() {
   };
 
   const updateStatus = async (row, status) => {
-    await base44.entities.Donation.update(row.id, { verification_status: status });
+    await base44.entities.Donation.update(row.id, { ...row, verification_status: status });
     toast({ title: `Donation ${status.toLowerCase()}` });
     load();
   };

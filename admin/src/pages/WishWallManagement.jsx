@@ -9,7 +9,7 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import FormModal from '@/components/shared/FormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ActionTooltip from '@/components/shared/ActionTooltip';
-import moment from 'moment';
+
 
 const wishFields = [
   { key: 'title', label: 'Requirement', required: true },
@@ -69,7 +69,7 @@ export default function WishWallManagement() {
   };
 
   const markFulfilled = async (row) => {
-    await base44.entities.WishWall.update(row.id, { status: 'Fulfilled', fulfilled_count: row.quantity });
+    await base44.entities.WishWall.update(row.id, { ...row, status: 'Fulfilled', fulfilled_count: row.quantity });
     toast({ title: 'Wish marked as fulfilled!' });
     load();
   };

@@ -84,7 +84,7 @@ export default function VolunteerManagement() {
   };
 
   const issueCertificate = async (row) => {
-    await base44.entities.Volunteer.update(row.id, { certificate_issued: true });
+    await base44.entities.Volunteer.update(row.id, { ...row, certificate_issued: true });
     toast({ title: 'Certificate marked as issued' });
     load();
   };

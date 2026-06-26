@@ -13,7 +13,7 @@ const donationSchema = new mongoose.Schema({
   verificationStatus: {
     type: String,
     required: true,
-    enum: ['Pending', 'Verified', 'Rejected'],
+    enum: ['Pending', 'Verified', 'Rejected', 'Approved'],
     default: 'Pending'
   },
   notes: { type: String, default: '', trim: true }
