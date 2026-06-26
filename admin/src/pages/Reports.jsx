@@ -56,7 +56,7 @@ export default function Reports() {
 
   const exportReport = () => {
     const reportData = [
-      'SMART CARE CONNECT — REPORT',
+      'JIVAN JYOT ASHRAM — REPORT',
       `Generated: ${moment().format('MMMM DD, YYYY')}`,
       `Period: ${period}`,
       '',

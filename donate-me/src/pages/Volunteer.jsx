@@ -295,7 +295,7 @@ export default function Volunteer() {
             <div className="mt-20 border-t border-border pt-16">
               <div className="text-center mb-12">
                 <h3 className="font-heading font-bold text-3xl text-foreground mb-3">Our Dedicated Volunteers</h3>
-                <p className="text-muted-foreground text-sm max-w-md mx-auto">Meet the passionate individuals who dedicate their time and talent to support the smart care community.</p>
+                <p className="text-muted-foreground text-sm max-w-md mx-auto">Meet the passionate individuals who dedicate their time and talent to support the Jivan Jyot community.</p>
               </div>
               {loadingVolunteers ? (
                 <div className="text-center text-sm text-muted-foreground py-8">Loading volunteer gallery...</div>

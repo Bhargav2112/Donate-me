@@ -88,7 +88,7 @@ export default function Certificates() {
                 <Award className="w-12 h-12 text-[#d4a843]" />
               </div>
               <h1 className="text-3xl font-serif font-bold text-[#1a365d] mb-1">Certificate of Appreciation</h1>
-              <p className="text-xs tracking-[4px] uppercase text-gray-500 mb-8">Smart Care Connect</p>
+              <p className="text-xs tracking-[4px] uppercase text-gray-500 mb-8">Jivan Jyot Ashram</p>
 
               <p className="text-sm text-gray-500 mb-2">This certificate is proudly presented to</p>
               <p className="text-2xl font-serif font-bold text-[#1a365d] border-b-2 border-[#d4a843] inline-block pb-2 mb-6">{selected.name}</p>

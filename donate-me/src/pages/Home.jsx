@@ -51,15 +51,15 @@ const successStories = {
 
 const testimonials = {
   gu: [
-    { name: "શ્રી અમિત જોશી", role: "દાતા", text: "Smart Care Connect ની પારદર્શકતાએ મને નિયમિત દાતા બનાવ્યો. દરેક રૂપિયાનો ઉપયોગ દેખાય છે." },
+    { name: "શ્રી અમિત જોશી", role: "દાતા", text: "જીવન જ્યોત આશ્રમની પારદર્શકતાએ મને નિયમિત દાતા બનાવ્યો. દરેક રૂપિયાનો ઉપયોગ દેખાય છે." },
     { name: "સુશ્રી નેહા પટેલ", role: "સ્વયંસેવક", text: "અહીં સ્વયંસેવક તરીકે કામ કરવું મારા જીવનનો શ્રેષ્ઠ અનુભવ છે. બાળકોના ચહેરા પરનું સ્મિત બધું કહે છે." },
   ],
   en: [
-    { name: "Shri Amit Joshi", role: "Donor", text: "Smart Care Connect's transparency made me a regular donor. Every rupee's usage is visible." },
+    { name: "Shri Amit Joshi", role: "Donor", text: "Jivan Jyot Ashram's transparency made me a regular donor. Every rupee's usage is visible." },
     { name: "Ms. Neha Patel", role: "Volunteer", text: "Working here as a volunteer is the best experience of my life. The smiles on children's faces say it all." },
   ],
   hi: [
-    { name: "श्री अमित जोशी", role: "दाता", text: "Smart Care Connect की पारदर्शिता ने मुझे नियमित दाता बनाया। हर रुपये का उपयोग दिखता है।" },
+    { name: "श्री अमित जोशी", role: "दाता", text: "जीवन ज्योत आश्रम की पारदर्शिता ने मुझे नियमित दाता बनाया। हर रुपये का उपयोग दिखता है।" },
     { name: "सुश्री नेहा पटेल", role: "स्वयंसेवक", text: "यहाँ स्वयंसेवक के रूप में काम करना मेरे जीवन का सबसे अच्छा अनुभव है। बच्चों के चेहरे की मुस्कान सब कुछ कह देती है।" },
   ],
 };

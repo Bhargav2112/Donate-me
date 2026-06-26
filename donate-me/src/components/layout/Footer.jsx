@@ -51,7 +51,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary-foreground/60" />
-                <a href="https://maps.app.goo.gl/Lr5ULSgyk3vBpydv9?g_st=aw" target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/70 hover:text-primary-foreground hover:underline transition-colors">
+                <a href="https://maps.app.goo.gl/queDbEy1EmvL1eMGA?g_st=aw" target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/70 hover:text-primary-foreground hover:underline transition-colors">
                   Sardar Chowk, Jivan Jyot Ashram Road, Navagam, Surat - 394185
                 </a>
               </li>

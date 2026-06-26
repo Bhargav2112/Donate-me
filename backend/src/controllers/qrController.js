@@ -12,7 +12,7 @@ const getQRDetails = async (req, res) => {
         success: true,
         source: 'env',
         data: {
-          upiId: process.env.UPI_ID || 'aashram@upi',
+          upiId: process.env.UPI_ID || 'jivanjyotashram@upi',
           upiName: process.env.UPI_NAME || 'Jivan Jyot Manav Mandir Mandbuddhi Ashram',
           bankName: 'Jivan Jyot Ashram Bank',
           accountHolder: 'Jivan Jyot Manav Mandir Mandbuddhi Ashram',
@@ -41,7 +41,7 @@ const generateDonationQR = async (req, res) => {
 
     // Check if dynamic database configuration exists
     const config = await QRConfig.findOne({ isActive: true });
-    const targetUpiId = config ? config.upiId : (process.env.UPI_ID || 'aashram@upi');
+    const targetUpiId = config ? config.upiId : (process.env.UPI_ID || 'jivanjyotashram@upi');
     const targetUpiName = config ? config.upiName : (process.env.UPI_NAME || 'Jivan Jyot Manav Mandir Mandbuddhi Ashram');
 
     // Build UPI payload URL
@@ -116,7 +116,7 @@ const createQR = async (req, res) => {
     }
 
     const newConfig = await QRConfig.create({
-      upiId: upiId || 'aashram@upi',
+      upiId: upiId || 'jivanjyotashram@upi',
       upiName: upiName || bankName || 'Jivan Jyot Ashram Account',
       bankName: bankName || '',
       accountHolder: accountHolder || '',

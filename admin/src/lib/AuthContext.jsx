@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       setAppPublicSettings({
         id: 'mock-app',
         public_settings: {
-          appName: 'Smart Care Connect',
+          appName: 'Jivan Jyot Ashram',
           requiresAuth: true
         }
       });

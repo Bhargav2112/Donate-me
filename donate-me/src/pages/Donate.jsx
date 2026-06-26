@@ -10,7 +10,7 @@ const BANK_INFO = {
   bank_name_value: 'State Bank of India',
   account_no_value: '12345678901234',
   ifsc_value: 'SBIN0001234',
-  upi_value: 'smartcareconnect@sbi',
+  upi_value: 'jivanjyotashram@upi',
 };
 
 export default function Donate() {

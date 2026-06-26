@@ -30,7 +30,7 @@ export default function Contact() {
       icon: MapPin,
       title: t('contact_address'),
       value: 'Sardar Chowk, Jivan Jyot Ashram Road, Near Tulsi Bangolows, Navagam, Surat, Gujarat - 394185',
-      href: 'https://maps.app.goo.gl/Lr5ULSgyk3vBpydv9?g_st=aw',
+      href: 'https://maps.app.goo.gl/queDbEy1EmvL1eMGA?g_st=aw',
     },
     {
       icon: Phone,
@@ -85,7 +85,7 @@ export default function Contact() {
             <ScrollReveal>
               <div className="rounded-2xl overflow-hidden border border-border h-[400px]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3718.7758784013444!2d72.8986873154332!3d21.240751985885233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f4db4a8ff93%3A0x7d97b4ec9bc1ff4!2sJivan%20Jyot%20Manav%20Mandir%20Mandbuddhi%20Ashram!5e0!3m2!1sen!2sin!4v1687788421035!5m2!1sen!2sin"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3718.7758784013444!2d72.8986873154332!3d21.240751985885233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be045c461b05569%3A0xcd8987d0954df238!2sJivan%20Jyot%20Mandbudhdhi%20Manav%20Mandir%20Ashram!5e0!3m2!1sen!2sin!4v1687788421035!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

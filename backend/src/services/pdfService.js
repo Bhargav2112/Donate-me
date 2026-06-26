@@ -13,8 +13,8 @@ const generateCertificateBuffer = (volunteer, issueDate) => {
     doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).lineWidth(4).stroke('#1a365d');
     doc.rect(26, 26, doc.page.width - 52, doc.page.height - 52).lineWidth(1.5).stroke('#d69e2e');
 
-    // Header AASHRAM FOUNDATION
-    doc.font('Helvetica-Bold').fontSize(16).fillColor('#1a365d').text('AASHRAM FOUNDATION', 0, 50, { align: 'center' });
+    // Header JIVAN JYOT ASHRAM
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#1a365d').text('JIVAN JYOT ASHRAM FOUNDATION', 0, 50, { align: 'center' });
     doc.font('Helvetica').fontSize(10).fillColor('#718096').text('Serving the Community with Care and Dignity', 0, 70, { align: 'center' });
 
     // Decorative shape/ribbon (using text or vector)
@@ -55,7 +55,7 @@ const generateCertificateBuffer = (volunteer, issueDate) => {
       width: 200,
       align: 'center'
     });
-    doc.font('Helvetica').fontSize(10).fillColor('#718096').text('Aashram Trust Management', doc.page.width - 280, 492, {
+    doc.font('Helvetica').fontSize(10).fillColor('#718096').text('Jivan Jyot Ashram Management', doc.page.width - 280, 492, {
       width: 200,
       align: 'center'
     });
@@ -336,12 +336,12 @@ const generateDischargeFormBuffer = (discharge, resident) => {
 
     doc.fontSize(10).font('Helvetica-Oblique').fillColor('#4a5568');
     doc.text(
-      'To the Management of Manav Seva Samaj Trust, Aashram Surat:\n\n' +
+      'To the Management of Manav Seva Samaj Trust, Jivan Jyot Ashram Surat:\n\n' +
       'We hereby state that our resident relative was admitted in the Ashram in a poor state of health and mind. ' +
       'Today, through the treatment, boarding, and care provided completely free of charge by your institution, ' +
       'they are being handed back over to our home in a safe, healthy, and restored condition.\n\n' +
       'We express our deep gratitude to the organization. Henceforth, all custody, well-being, and legal ' +
-      'responsibilities of the discharged individual rest solely with us. The Aashram trust and its management ' +
+      'responsibilities of the discharged individual rest solely with us. The Jivan Jyot Ashram trust and its management ' +
       'will hold zero responsibility or liability from this day forward.',
       60, 345, { width: doc.page.width - 120, lineGap: 4 }
     );
@@ -374,7 +374,7 @@ const generateDischargeFormBuffer = (discharge, resident) => {
     // Right side: Ashram representative
     doc.moveTo(doc.page.width - 230, sigY).lineTo(doc.page.width - 60, sigY).lineWidth(0.75).stroke('#718096');
     doc.fillColor('#2d3748').font('Helvetica-Bold').fontSize(9).text('Authorized Representative / Seal', doc.page.width - 230, sigY + 6, { align: 'center', width: 170 });
-    doc.font('Helvetica').fillColor('#718096').text('AASHRAM SURAT TRUSTEE', doc.page.width - 230, sigY + 18, { align: 'center', width: 170 });
+    doc.font('Helvetica').fillColor('#718096').text('JIVAN JYOT ASHRAM TRUSTEE', doc.page.width - 230, sigY + 18, { align: 'center', width: 170 });
 
     doc.end();
   });
