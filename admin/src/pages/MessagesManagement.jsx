@@ -37,7 +37,7 @@ export default function MessagesManagement() {
 
   const handleDelete = async () => {
     try {
-      await base44.entities.ContactMessage.delete(deleteTarget.id);
+      await base44.entities.ContactMessage.delete(deleteTarget._id || deleteTarget.id);
       setDeleteTarget(null);
       toast({ title: 'Message removed successfully' });
       load();
