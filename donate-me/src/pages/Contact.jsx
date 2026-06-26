@@ -29,19 +29,20 @@ export default function Contact() {
     {
       icon: MapPin,
       title: t('contact_address'),
-      value: 'Smart Care Connect, Near City Hospital, Satellite Road, Ahmedabad, Gujarat 380015',
+      value: 'Sardar Chowk, Jivan Jyot Ashram Road, Near Tulsi Bangolows, Navagam, Surat, Gujarat - 394185',
+      href: 'https://maps.app.goo.gl/Lr5ULSgyk3vBpydv9?g_st=aw',
     },
     {
       icon: Phone,
       title: t('contact_phone'),
-      value: '+91 98765 43210',
-      href: 'tel:+919876543210',
+      value: '+91 99246 16768 / +91 98790 01943',
+      href: 'tel:+919924616768',
     },
     {
       icon: Mail,
       title: t('contact_email'),
-      value: 'info@smartcareconnect.org',
-      href: 'mailto:info@smartcareconnect.org',
+      value: 'manavsevasamaj.surat@gmail.com',
+      href: 'mailto:manavsevasamaj.surat@gmail.com',
     },
     {
       icon: Clock,
@@ -70,7 +71,7 @@ export default function Contact() {
                   </div>
                   <h3 className="font-heading font-semibold text-foreground text-sm mb-2">{card.title}</h3>
                   {card.href ? (
-                    <a href={card.href} className="text-sm text-secondary hover:underline break-all">{card.value}</a>
+                    <a href={card.href} target={card.icon === MapPin ? "_blank" : undefined} rel={card.icon === MapPin ? "noopener noreferrer" : undefined} className="text-sm text-secondary hover:underline break-all">{card.value}</a>
                   ) : (
                     <p className="text-sm text-muted-foreground">{card.value}</p>
                   )}
@@ -84,13 +85,13 @@ export default function Contact() {
             <ScrollReveal>
               <div className="rounded-2xl overflow-hidden border border-border h-[400px]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.2!2d72.51!3d23.03!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDAyJzAwLjAiTiA3MsKwMzAnMzYuMCJF!5e0!3m2!1sen!2sin!4v1234567890"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3718.7758784013444!2d72.8986873154332!3d21.240751985885233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f4db4a8ff93%3A0x7d97b4ec9bc1ff4!2sJivan%20Jyot%20Manav%20Mandir%20Mandbuddhi%20Ashram!5e0!3m2!1sen!2sin!4v1687788421035!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
-                  title="Smart Care Connect Location"
+                  title="Jivan Jyot Ashram Location"
                 ></iframe>
               </div>
             </ScrollReveal>

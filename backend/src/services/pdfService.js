@@ -77,10 +77,10 @@ const generateDonationReceiptBuffer = (donation, donor) => {
     doc.rect(30, 30, doc.page.width - 60, doc.page.height - 60).lineWidth(1).stroke('#e2e8f0');
 
     // Header Area
-    doc.fillColor('#1a365d').fontSize(26).font('Helvetica-Bold').text('AASHRAM FOUNDATION', 50, 60);
+    doc.fillColor('#1a365d').fontSize(26).font('Helvetica-Bold').text('JIVAN JYOT ASHRAM', 50, 60);
     doc.fontSize(10).font('Helvetica').fillColor('#718096').text(
-      '123 Care Street, Sunshine Colony, Pune - 411001\n' +
-      'Phone: +91 98765 43210 | Email: donations@aashram.org | Web: www.aashram.org',
+      'Sardar Chowk, Jivan Jyot Ashram Road, Navagam, Surat, Gujarat - 394185\n' +
+      'Phone: +91 99246 16768, +91 98790 01943 | Email: manavsevasamaj.surat@gmail.com',
       50, 92
     );
 
@@ -129,7 +129,7 @@ const generateDonationReceiptBuffer = (donation, donor) => {
     const rowY = tableY + 25;
     doc.rect(50, rowY, doc.page.width - 100, 40).fill('#f7fafc');
     doc.rect(50, rowY, doc.page.width - 100, 40).lineWidth(1).stroke('#e2e8f0');
-    doc.fillColor('#2d3748').font('Helvetica').fontSize(10).text('Voluntary Contribution towards Aashram Welfare Fund', 60, rowY + 15);
+    doc.fillColor('#2d3748').font('Helvetica').fontSize(10).text('Voluntary Contribution towards Jivan Jyot Ashram Welfare Fund', 60, rowY + 15);
     doc.font('Helvetica-Bold').fontSize(11).text(`Rs. ${donation.amount.toFixed(2)}`, doc.page.width - 150, rowY + 15, {
       align: 'right',
       width: 90
@@ -148,7 +148,7 @@ const generateDonationReceiptBuffer = (donation, donor) => {
     // Legal and Tax Exemption Note
     doc.rect(50, 480, doc.page.width - 100, 60).fill('#edf2f7');
     doc.fillColor('#4a5568').font('Helvetica').fontSize(9).text(
-      'Thank you for your contribution. Aashram Foundation is a registered charity. ' +
+      'Thank you for your contribution. Jivan Jyot Manav Mandir Mandbuddhi Ashram is a registered charity (E/7349/Surat). ' +
       'All donations are voluntary and utilized solely for resident care, medical treatments, ' +
       'and maintenance of shelter facilities. Please retain this receipt for your records.',
       60, 490, { width: doc.page.width - 120, lineGap: 3 }
@@ -161,7 +161,7 @@ const generateDonationReceiptBuffer = (donation, donor) => {
       width: 170,
       align: 'center'
     });
-    doc.fillColor('#718096').font('Helvetica').fontSize(9).text('AASHRAM FOUNDATION', doc.page.width - 220, sigY + 22, {
+    doc.fillColor('#718096').font('Helvetica').fontSize(9).text('JIVAN JYOT ASHRAM FOUNDATION', doc.page.width - 220, sigY + 22, {
       width: 170,
       align: 'center'
     });
@@ -182,7 +182,7 @@ const generateMonthlyReportBuffer = (data) => {
     const { month, year, stats } = data;
 
     // Header
-    doc.fillColor('#1a365d').fontSize(22).font('Helvetica-Bold').text('AASHRAM FOUNDATION', 50, 50);
+    doc.fillColor('#1a365d').fontSize(22).font('Helvetica-Bold').text('JIVAN JYOT MANAV MANDIR ASHRAM', 50, 50);
     doc.fontSize(14).fillColor('#d69e2e').text(`MONTHLY OPERATIONS REPORT - ${month.toUpperCase()} ${year}`, 50, 75);
     
     // Metadata
@@ -264,7 +264,7 @@ const generateMonthlyReportBuffer = (data) => {
     // Footer Copyright notice
     doc.moveTo(50, 720).lineTo(doc.page.width - 50, 720).lineWidth(1).stroke('#e2e8f0');
     doc.font('Helvetica').fontSize(8.5).fillColor('#718096').text(
-      'Aashram Foundation Operations Report. For Internal Circulation and Audit Only.',
+      'Jivan Jyot Ashram Operations Report. For Internal Circulation and Audit Only.',
       50, 735, { align: 'center' }
     );
 

@@ -7,8 +7,8 @@ import ScrollReveal from '@/components/shared/ScrollReveal';
 import SectionHeader from '@/components/shared/SectionHeader';
 import StatCounter from '@/components/shared/StatCounter';
 
-const HERO_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/995cb9422_generated_e47bf63e.png';
-const ABOUT_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/564ac39f3_generated_a67c2e1b.png';
+import HERO_IMG from '@/assets/ashram3.jpg';
+import ABOUT_IMG from '@/assets/ashram2.jpg';
 
 const objectives = {
   gu: [

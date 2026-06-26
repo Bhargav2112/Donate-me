@@ -116,7 +116,7 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Welcome to the Aashram Backend System API',
+    message: 'Welcome to the Jivan Jyot Ashram Backend System API',
     version: '1.0.0',
     documentation: 'See walkthrough.md in backend system artifacts',
     endpoints: {

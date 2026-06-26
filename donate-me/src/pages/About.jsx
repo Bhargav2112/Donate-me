@@ -4,7 +4,7 @@ import ScrollReveal from '@/components/shared/ScrollReveal';
 import SectionHeader from '@/components/shared/SectionHeader';
 import { Target, Eye, Award, Users } from 'lucide-react';
 
-const ABOUT_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/564ac39f3_generated_a67c2e1b.png';
+import ABOUT_IMG from '@/assets/ashram2.jpg';
 
 const objectives = {
   gu: [

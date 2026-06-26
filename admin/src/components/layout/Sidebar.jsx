@@ -36,13 +36,11 @@ export default function Sidebar() {
   const NavContent = () => (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-          <HandCoins className="w-4 h-4 text-sidebar-primary-foreground" />
-        </div>
+        <img src="/logo.png" alt="Jivan Jyot Logo" className="w-8 h-8 object-contain rounded bg-white p-0.5" />
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="text-sm font-bold text-sidebar-foreground truncate">Smart Care</h1>
-            <p className="text-[10px] text-sidebar-foreground/60 truncate">Connect Admin</p>
+            <h1 className="text-xs font-bold text-sidebar-foreground truncate">Jivan Jyot</h1>
+            <p className="text-[10px] text-sidebar-foreground/60 truncate">Ashram Admin</p>
           </div>
         )}
       </div>

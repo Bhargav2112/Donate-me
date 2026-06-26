@@ -6,7 +6,7 @@ import SectionHeader from '@/components/shared/SectionHeader';
 import { Calendar, MapPin, Clock, ImageIcon } from 'lucide-react';
 import moment from 'moment';
 
-const EVENTS_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/b74ba8ef1_generated_a2282d49.png';
+import EVENTS_IMG from '@/assets/ashram1.jpg';
 
 export default function Events() {
   const { t } = useLang();

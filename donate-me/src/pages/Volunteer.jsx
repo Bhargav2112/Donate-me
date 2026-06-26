@@ -6,7 +6,7 @@ import SectionHeader from '@/components/shared/SectionHeader';
 import { useToast } from '@/components/ui/use-toast';
 import { CheckCircle2 } from 'lucide-react';
 
-const VOLUNTEER_IMG = 'https://media.base44.com/images/public/6a3418bebdfcfa2d9b852821/1c53969f0_generated_4cd383fa.png';
+import VOLUNTEER_IMG from '@/assets/ashram1.jpg';
 
 export default function Volunteer() {
   const { t } = useLang();

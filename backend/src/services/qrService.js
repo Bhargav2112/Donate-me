@@ -2,7 +2,7 @@ const QRCode = require('qrcode');
 
 const generateUPIQR = async (amount, notes) => {
   const upiId = process.env.UPI_ID || 'aashram@upi';
-  const upiName = process.env.UPI_NAME || 'Aashram Trust';
+  const upiName = process.env.UPI_NAME || 'Jivan Jyot Manav Mandir Mandbuddhi Ashram';
 
   // Build standard UPI URL payload
   let upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&cu=INR`;

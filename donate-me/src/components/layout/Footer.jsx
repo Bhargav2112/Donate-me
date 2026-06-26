@@ -21,10 +21,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
-                <Heart className="w-5 h-5" fill="currentColor" />
-              </div>
-              <span className="font-heading font-bold text-lg">Smart Care Connect</span>
+              <img src="/logo.png" alt="Jivan Jyot Ashram Logo" className="w-10 h-10 object-contain rounded-lg bg-white p-0.5" />
+              <span className="font-heading font-bold text-lg">Jivan Jyot Ashram</span>
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed">
               {t('footer_desc')}
@@ -53,20 +51,25 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary-foreground/60" />
-                <span className="text-sm text-primary-foreground/70">
-                  Smart Care Connect, Ahmedabad, Gujarat 380015
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 shrink-0 text-primary-foreground/60" />
-                <a href="tel:+919876543210" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  +91 98765 43210
+                <a href="https://maps.app.goo.gl/Lr5ULSgyk3vBpydv9?g_st=aw" target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/70 hover:text-primary-foreground hover:underline transition-colors">
+                  Sardar Chowk, Jivan Jyot Ashram Road, Navagam, Surat - 394185
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 shrink-0 text-primary-foreground/60" />
+                <div className="flex flex-col">
+                  <a href="tel:+919924616768" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                    +91 99246 16768
+                  </a>
+                  <a href="tel:+919879001943" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                    +91 98790 01943
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 shrink-0 text-primary-foreground/60" />
-                <a href="mailto:info@smartcareconnect.org" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  info@smartcareconnect.org
+                <a href="mailto:manavsevasamaj.surat@gmail.com" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  manavsevasamaj.surat@gmail.com
                 </a>
               </li>
             </ul>
