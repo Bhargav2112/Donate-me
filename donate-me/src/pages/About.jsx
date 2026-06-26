@@ -39,7 +39,6 @@ export default function About() {
   const trustees = [
     { name: t('trustee_1_name'), role: t('trustee_1_role'), icon: Award },
     { name: t('trustee_2_name'), role: t('trustee_2_role'), icon: Users },
-    { name: t('trustee_3_name'), role: t('trustee_3_role'), icon: Target },
   ];
 
   return (
