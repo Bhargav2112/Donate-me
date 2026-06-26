@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, CheckCircle, XCircle, Shield, Eye } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Shield, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/shared/PageHeader';
@@ -8,6 +8,7 @@ import DataTable from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import FormModal from '@/components/shared/FormModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ActionTooltip from '@/components/shared/ActionTooltip';
 import moment from 'moment';
 
@@ -30,6 +31,7 @@ export default function DonationManagement() {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const { toast } = useToast();
 
   const load = async () => {
@@ -40,6 +42,21 @@ export default function DonationManagement() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const handleDelete = async () => {
+    try {
+      await base44.entities.Donation.delete(deleteTarget.id || deleteTarget._id);
+      setDeleteTarget(null);
+      toast({ title: 'Donation deleted successfully' });
+      load();
+    } catch (e) {
+      toast({
+        title: 'Delete failed',
+        description: e.message || 'Could not delete donation.',
+        variant: 'destructive'
+      });
+    }
+  };
 
   const openAdd = () => { setEditing(null); setForm({ verification_status: 'Pending', payment_method: 'UPI' }); setModalOpen(true); };
   const openEdit = (row) => { setEditing(row); setForm({ ...row }); setModalOpen(true); };
@@ -130,7 +147,7 @@ export default function DonationManagement() {
     {
       key: 'actions', label: 'Actions',
       render: (_, row) => (
-        <div className="flex gap-1">
+        <div className="flex gap-1" onClick={e => e.stopPropagation()}>
           <ActionTooltip content="View Details">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); setDetailItem(row); }}>
               <Eye className="w-3.5 h-3.5" />
@@ -155,6 +172,11 @@ export default function DonationManagement() {
               </ActionTooltip>
             </>
           )}
+          <ActionTooltip content="Delete Record">
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={e => { e.stopPropagation(); setDeleteTarget(row); }}>
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
+          </ActionTooltip>
         </div>
       )
     },
@@ -198,6 +220,19 @@ export default function DonationManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Donation Record?</AlertDialogTitle>
+            <AlertDialogDescription>This will permanently remove the donation record from {deleteTarget?.donor_name}.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
