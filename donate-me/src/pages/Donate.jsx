@@ -178,8 +178,8 @@ export default function Donate() {
                   {qrConfig ? (
                     <div className="space-y-2">
                       <img src={qrConfig.qr_image || qrConfig.qr_code_url} alt="UPI QR Code" className="w-36 h-36 mx-auto rounded-xl border border-border bg-white p-1" />
-                      <div className="text-xs font-semibold text-foreground">{qrConfig.title}</div>
-                      <div className="text-[10px] text-muted-foreground font-mono">{qrConfig.purpose}</div>
+                      <div className="text-xs font-semibold text-foreground">{qrConfig.upiName || qrConfig.account_holder || qrConfig.title || 'Jivan Jyot Ashram'}</div>
+                      <div className="text-[10px] text-muted-foreground font-mono">{qrConfig.purpose || t('donation_title')}</div>
                     </div>
                   ) : (
                     <div className="w-32 h-32 bg-muted rounded-xl mx-auto flex items-center justify-center">

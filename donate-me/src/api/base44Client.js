@@ -638,7 +638,7 @@ export const base44 = {
     WishWall: new HttpEntity('/requirements', 'WishWall', wishWallSerializers),
     WishItem: new HttpEntity('/requirements', 'WishItem', wishItemSerializers),
     ContactMessage: new HttpEntity('/messages', 'ContactMessage'),
-    QRDonation: new HttpEntity('/qr', 'QRDonation', qrConfigSerializers),
+    QRDonation: new HttpEntity('/qr/details', 'QRDonation', qrConfigSerializers),
     RequirementContribution: new HttpEntity('/contributions', 'RequirementContribution'),
     AuditLog: new HttpEntity('/dashboard', 'AuditLog', { toFrontend: auditLogSerializers.toFrontend })
   },
